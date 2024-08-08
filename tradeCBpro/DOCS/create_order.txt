@@ -1,9 +1,0 @@
-CREATE ORDER
-Create an order with a specified product_id (asset-pair), side (buy/sell), etc.
-
-Example:
-order_configuration
-market_market_ioc
-quote_size - Amount of quote currency to spend on order. Only applicable to BUY orders.
-
-base_size - Amount of base currency to spend on order. Applicable to BUY or SELL orders.
