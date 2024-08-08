@@ -1,0 +1,15 @@
+LIST ORDERS
+Get a list of orders filtered by optional query parameters (product_id, order_status, etc).
+
+#About Open Orders
+#The maximum number of OPEN orders returned is 1000. For more, use the WebSocket User channel to retrieve all open orders.
+#The parameters start_date and end_date don’t apply to open orders.
+#You cannot pair open orders with other order types.
+
+# YOU CANNOT QUERY FOR OPEN ORDERS WITH OTHER ORDER TYPES.
+# Allowed
+#/orders/historical/batch?order_status=OPEN
+#/orders/historical/batch?order_status=CANCELLED,EXPIRED
+
+# Not allowed
+#/orders/historical/batch?order_status=OPEN,CANCELLED
