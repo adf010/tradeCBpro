@@ -1,2 +1,0 @@
-LIVE TICKER
-Currently, the only option to exit is <CTRL>-c or close terminal window. Live ticker shows the price of BTC every 3 seconds. Options to change the product and frequency of update, and an option to exit will be added.
