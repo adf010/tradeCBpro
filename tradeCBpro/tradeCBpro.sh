@@ -2272,30 +2272,34 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     lines=$(tput lines)
     fold  -w "$columns" -bs DOCS/live_ticker.txt
     echo
-read -p "Do you want to continue? (y or n):" n
-if [[ "$n" == "n" ]]; then
+
+read -p "Do you want to continue? (y or n) : " n
+if [[ $n == "n" ]]; then
 $0
 fi
+
+read -p "Enter your preferred ticker or press ENTER for Default = [BTC-USD]:" prod_id ; prod_id=${prod_id:-BTC-USD}
+prod_id=${prod_id^^}
+echo
+echo -e '\E[32;40m'"\033[1m"
 
      while true
 do
 
-#f [[ "$k" == 's' ]] && break
-#read -t 0.3 -n 1 k
-
-sleep 3s
-outputb=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
-
-#read -t 0.3 -n 1 k
-#if [[ "$k" == 's' ]] && break
+sleep 1s
+outputb=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
 
 echo -n "$outputb" $'\r'
 
-#fi
 outputbtc="${outputb%.*}"
 #echo "$outputbtc"
 
+if read -r -N 1 -t 2; then
+        break
+    fi
+
 done
+####################################################################################################
     i=1
     ;;
 
