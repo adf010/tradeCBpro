@@ -2272,7 +2272,10 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     lines=$(tput lines)
     fold  -w "$columns" -bs DOCS/live_ticker.txt
     echo
-
+read -p "Do you want to continue? (y or n):" n
+if [[ "$n" == "n" ]]; then
+$0
+fi
 
      while true
 do
