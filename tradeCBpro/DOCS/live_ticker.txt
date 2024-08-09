@@ -1,2 +1,5 @@
 LIVE TICKER
-Currently, the only option to exit is <CTRL>-c or close terminal window. Live ticker shows the price of BTC about every 3 seconds. To exit the ticker, press any key within 2 seconds after price updates.
+
+Live ticker shows the current price of Coinbase™ trading pairs about every 3 seconds. The default is BTC-USD but you can enter other pairs.
+
+To exit the ticker, press any key.

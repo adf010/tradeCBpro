@@ -2092,7 +2092,7 @@ echo
        columns=$(tput cols)
        lines=$(tput lines)
        fold  -w "$columns" -bs  DOCS/notes.txt
-echo
+       echo
 
        read -p "Press ENTER to continue:" z
        #bash -c "xdg-open $USER/CBnotes.txt 2> /dev/null"
@@ -2159,10 +2159,10 @@ echo
     j=1
     while [ $j = 1 ] ; do
         clear
+        echo -e '\E[33;40m'"\033[1m"
         echo "                       Quickmafs"
         echo "                       ---------"
         echo  
-echo -e '\E[33;40m'"\033[1m"
 echo "Exit to main menu           = 0"
 echo "Calculate BTC to USD        = 1"
 echo "Calculate Amount of ONION   = 2"  
@@ -2183,9 +2183,8 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     i=0   
     ;;
     
-    1)  # CHANGE SOURCE APIs TO COINBASE
+    1)
     echo " Calculate BTC to USD "
-    #BTCBTC=$(curl -s https://api-pub.bitfinex.com/v2/ticker/tBTCUSD | awk -F',' '{print  $7}')
     BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     echo "BTC = $"$BTCBTC
     read -p " Enter the BTC amount you want to buy/sell : " c
@@ -2197,7 +2196,6 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     i=0
     ;;
     2)    echo " Calculate Amount of ONION For Amount of BTC "
-    #BTCBTC=$(curl -s https://api-pub.bitfinex.com/v2/ticker/tBTCUSD | awk -F',' '{print  $7}')
     BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     echo "BTC = $"$BTCBTC
     read -p " Enter The Price of ONION : " u
@@ -2210,7 +2208,6 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     i=0
     ;;
     3)    echo " Calculate BTC Cost "
-    #BTCBTC=$(curl -s https://api-pub.bitfinex.com/v2/ticker/tBTCUSD | awk -F',' '{print  $7}')
     BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     echo "BTC = $"$BTCBTC
     read -p " Enter Amount of BTC : " y
@@ -2222,7 +2219,6 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     i=0
     ;;
     4)    echo " Calculate Amount of BTC "
-    #BTCBTC=$(curl -s https://api-pub.bitfinex.com/v2/ticker/tBTCUSD | awk -F',' '{print  $7}')
     BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     echo "BTC = $"$BTCBTC
     read -p " Enter Amount of USD : " w
@@ -2257,14 +2253,6 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
     echo " Fee is About : " $AmountOfFee
     read -p "Press ENTER to return to menu: " n
     i=1
-   # ;;
-   # *) 
-    
-    # TotalCost/AmounOfCrypto=CryptoPrice
-    #  $488.89     .01111111     44000.00
-    
-    # i=0
-
     ;;
     8) # Live TICKER
     clear
@@ -2275,7 +2263,7 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" a
 
 read -p "Do you want to continue? (y or n) : " n
 if [[ $n == "n" ]]; then
-$0
+break
 fi
 
 read -p "Enter your preferred ticker or press ENTER for Default = [BTC-USD]:" prod_id ; prod_id=${prod_id:-BTC-USD}
@@ -2302,31 +2290,18 @@ done
 ####################################################################################################
     i=1
     ;;
-
     *) 
     i=1;;
   esac  
 done
-
 echo -e '\E[32;40m'"\033[1m"  
-
-    printf "\n"
+   printf "\n"
    esac
 done
 echo -e '\E[32;40m'"\033[1m"  
-
     printf "\n"
     
-        
-#    i=0
-#    ;;
-#    *) 
-#    i=1;;
-  
-#  esac
-#done
 echo -e '\E[32;40m'"\033[1m"  
-
     printf "\n"
 #####  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
     elif [[ "$m" == "11" ]]; then
@@ -2501,11 +2476,6 @@ echo
   orderconfig0=${orderconfig1[dow-1]}
   fi
 
- # BODYX=
-#curl -L 'https://api.coinbase.com/api/v3/brokerage/orders' \
-#-H 'Content-Type: application/json' \
-#-d '{"client_order_id":"112345","product_id":"doge-usd","side":"SELL","order_configuration":{"limit_limit_gtc":{"post_only":true,"base_size":"2","limit_price":"0.11"}}}'
-
   read -p "Is this a BUY or SELL order? Default = [BUY]:" side1 ; side1=${side1:-BUY}
   side1=${side1^^}
   side0=${side1[dow-0]}
@@ -2547,11 +2517,6 @@ echo
     basequote0=${basequote1[dow-1]}
     fi
 
-    #if [[ "$orderconfig" == "limit" ]]; then
-    #orderconfig0=${orderconfig1[dow-2]}
-    #basequote0=${basequote1[dow-1]}
-    #fi
-
     echo "price=  ~" $price1 " + fee"
     echo
     read -p "Are the above values what you wanted ?" yn
@@ -2578,15 +2543,6 @@ requestpath="/api/v3/brokerage/orders"
 UUID1=$(uuidgen)
 #PID="product_id"
 PROD_ID=${prod_id}
-
-#curl -L 'https://api.coinbase.com/api/v3/brokerage/orders' \
-#-d '{"client_order_id":"12345","product_id":"BTC-USD","side":"BUY","order_configuration":{"limit_limit_gtc":{"base_size":"0.50000000","limit_price":"49000.00","post_only":true}}}
-
-
-#curl -L 'https://api.coinbase.com/api/v3/brokerage/orders' \
-#-H 'Content-Type: application/json' \
-#-d '{"client_order_id":"12345","product_id":"doge-usd","side":"BUY","order_configuration":{"market_market_ioc":{"quote_size":"2","base_size":".10"}}}'
-
 
 BODY="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\"}}}"
  echo $BODY
