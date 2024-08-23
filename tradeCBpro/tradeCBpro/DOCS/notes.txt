@@ -1,3 +1,0 @@
-THIS will create a personal notes file named CBnotes.txt in your home directory.
-You can change the path in the script to anywhere you want.
-You can create a list of exchange addresses or other info you wish to save. The editor used is nano. You can change that in the script if you wish to use a different editor. This will create and/or open a file named notes.txt in the current directory. If you chose this option by accident just close the editor ( <CTRL-x> ) or close the program window.

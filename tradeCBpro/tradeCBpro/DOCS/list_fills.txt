@@ -1,4 +1,0 @@
-LIST FILLS
-
-Get a list of fills filtered by optional query parameters (product_id, order_id, etc).
-

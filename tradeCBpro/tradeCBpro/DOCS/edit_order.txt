@@ -1,6 +1,0 @@
-EDIT ORDER
-
-Edit an order's size (quantity), or price. Only good-till-cancelled (GTC) Limit Orders can be edited.
-
-
-

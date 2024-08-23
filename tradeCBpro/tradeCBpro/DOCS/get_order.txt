@@ -1,4 +1,0 @@
-GET ORDER
-
-Get a single order by order ID.
-

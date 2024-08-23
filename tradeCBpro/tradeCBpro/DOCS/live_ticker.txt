@@ -1,5 +1,0 @@
-LIVE TICKER
-
-Live ticker shows the current price of Coinbase™ trading pairs about every 3 seconds. The default is BTC-USD but you can enter other pairs.
-
-To exit the ticker, press any key.

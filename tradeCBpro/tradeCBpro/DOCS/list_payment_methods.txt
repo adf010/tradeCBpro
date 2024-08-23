@@ -1,2 +1,0 @@
-LIST PAYMENT METHODS
-Get a list of payment methods for the current user.

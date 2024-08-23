@@ -1,4 +1,0 @@
-DEPOSITS
-Deposits user-defined amount of funds to a fiat account.
-You will need the payment account UUID and the recieving account UUID.
-Currently the call will commit by default so be sure to recheck your input when prompted.

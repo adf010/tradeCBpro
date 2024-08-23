@@ -1,4 +1,0 @@
-GET ACCOUNT
-Get a list of information about an account, given an account UUID.
-
-This command gives information about a specific account by entering the account UUID.

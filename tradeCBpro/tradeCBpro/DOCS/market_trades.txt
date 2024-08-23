@@ -1,7 +1,0 @@
-MARKET TRADES
-
-Get snapshot information by product ID about the last trades (ticks) and best bid/ask.
-
-
-
-
