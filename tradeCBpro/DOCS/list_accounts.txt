@@ -1,0 +1,9 @@
+LIST ACCOUNTS 
+Get a list of authenticated accounts for any Retail Portfolio ID the current user has access to. Only accounts matching this retail portfolio id are returned. If omitted, returns accounts for all retail portfolios permissioned for the API key.
+
+This command lists accounts of the current user. Enter the number of accounts you want to display. When the page displays the "cursor" ID will be displayed at the bottom of the page. If you choose to continue, that cursor ID will be used automatically unless you enter a specific account ID (cursor).
+
+A pagination limit with default of 49 and maximum of 250. If has_next is true, additional orders are available to be fetched with pagination and the cursor value in the response can be passed as cursor parameter in the subsequent request.
+
+You must enter a limit number.
+(hint: If you enter 0 it will return all accounts or 250 whichever is less.)

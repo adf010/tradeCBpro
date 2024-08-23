@@ -1,0 +1,3 @@
+HISTORICAL ORDERS
+Get a list of orders filtered by optional query parameters (product_id, order_status, etc).
+This section will query for historical transactions. It does not yet have all the options for power users but can be used to query for single or all trading pairs. It can be further queried for BUY, SELL, or ALL transactions for the trading pair(s). You also have the option to display OPEN, CANCELLED or EXPIRED transactions. Where there are DEFAULTS available you can just press ENTER to accept it.
