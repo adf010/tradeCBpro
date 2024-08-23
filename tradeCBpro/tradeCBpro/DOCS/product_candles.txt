@@ -1,0 +1,7 @@
+PRODUCT CANDLES
+
+Get rates for a single product by product ID, grouped in buckets.
+
+
+
+

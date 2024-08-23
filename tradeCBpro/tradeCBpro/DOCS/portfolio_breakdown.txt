@@ -1,0 +1,9 @@
+Portfolio Breakdown
+
+Get the breakdown of a portfolio.
+This endpoint requires the "view" permission (for that portfolio).
+Enter the Retail Portfolio UUID and the currency for that portfolio to see breakdown of balances.
+
+
+
+

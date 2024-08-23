@@ -1,0 +1,23 @@
+CREATE ORDER
+Create an order with a specified product_id (asset-pair), side (buy/sell), etc.
+
+Example:
+order_configuration
+market_market_ioc
+quote_size - Amount of quote currency to spend on order. Only applicable to BUY orders.
+
+base_size - Amount of base currency to spend on order. Applicable to BUY or SELL orders.
+
+Market BUY:
+Do the defaults first: If you ENTER 1 for quote, that will be 1 USD. If DOGE is about $0.10/DOGE you should get about 9.9 DOGE after fee.
+
+Market SELL:
+Use defaults but change "BUY" to "SELL". If you ENTER a 1 for quote you will sell 1 DOGE .
+
+Limit_gtc BUY:
+Change order type to limit. ENTER 2 for quote/base amount for 2 DOGE. ENTER a limit price to a couple cents less than the bid/ask prices.
+
+Limit_gtc SELL:
+Change order type to limit. Change side to sell. ENTER 2 for quote/base amount for 2 DOGE. ENTER a limit price to a couple cents more than the bid/ask prices.
+
+There are 3 stops for you to double check info. You can ignore the brackets and quotes. those are to keep the server happy :)
