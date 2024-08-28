@@ -1,0 +1,6 @@
+LIVE STATS
+
+Live stats shows the current price of Coinbase™ trading pairs about every 5 second>
+
+To exit the ticker, press any key.
+

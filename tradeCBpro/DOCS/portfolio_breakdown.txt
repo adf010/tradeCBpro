@@ -4,6 +4,11 @@ Get the breakdown of a portfolio.
 This endpoint requires the "view" permission (for that portfolio).
 Enter the Retail Portfolio UUID and the currency for that portfolio to see breakdown of balances.
 
+Hint: If you do not have your Retail Portfolio ID (RPID) handy just hit ENTER on both prompts and it will return the RPID that matches your API keys.
+
+
+
+
 
 
 

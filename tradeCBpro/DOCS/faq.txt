@@ -5,6 +5,12 @@ FAQ
 A.) Ahh, you've been reading through the script :) About 3 years ago I wrote a script to trade DeepOnion on three exchanges. When I started writing a script to use the Coinbase API I was going to add it to the script because SouthXchange shut down. It did not take long to see that Coinbase had many more calls and options which required some major changes to the menu layout. So I removed the other two exchanges and used the skeleton menu with the idea that I may expand the usability one day. 
 
 
-2.) Nothing (or only a few things) works!!!
+2.) Nothing (or only a few things) works!!!???
 
 A.) Are you using Legacy API keys? Do your keys have the permissions required for the call(s)? If you copy your Legacy API keys into the files, make sure you do not hit ENTER or space key after the paste. Make sure there are no extra spaces in the file.
+
+3.) Why do my historical (ordeers, fills, etc.) only return a partial list?
+
+A.) It apperars that only information from 2023 and forward is available on the v3 API. I do not know why but will be looking into it. )It is possible that I need to get the start and end dates option added in.)
+
+4.)
