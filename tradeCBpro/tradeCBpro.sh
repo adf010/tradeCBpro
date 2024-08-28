@@ -596,7 +596,7 @@ echo $end1
 echo $granularity1
 echo "$BODY"
 echo "${BENDPOINT}${requestpath}${BODY}"
-read -p " " n
+read -p "Press ENTER to continue : " n
 
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
@@ -960,7 +960,7 @@ TIMESTAMP=$(date +%s)
  requestpath="/api/v3/brokerage/orders/edit"
  BODY="'{"${order_id}":"${order_id1}","${price}":"${price1}","${size0}":"${size1}"}'"
  echo "${BODY}"
-   read -p " " n
+   read -p "Press ENTER to continue : " n
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
@@ -1210,7 +1210,7 @@ page0=$(cat $PATH0 | grep -w cursor | tr -d '"' | sed 's/,*$//g' | sed 's/cursor
 
 BODY="${limit0}${eq1}${limit1}${amps}${cursor0}${eq1}${page0}${amps}${retail_portfolio_id0}${eq1}${retail_portfolio_id1}${amps}${prod_id0}${eq1}${product_id1}"
 echo ${BODY}
-read -p "" n
+read -p "Press ENTER to continue : " n
 
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
@@ -1773,7 +1773,7 @@ echo
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
- read -p " " n
+ read -p "Press ENTER to continue : " n
 
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
@@ -1941,7 +1941,7 @@ requestpath="/v2/accounts/${account_id1}/withdrawals"
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
- read -p " " n
+ read -p "Press ENTER to continue : " n
 
 
 TIMESTAMP=$(date +%s)
