@@ -6,4 +6,4 @@ This command lists accounts of the current user. Enter the number of accounts yo
 A pagination limit with default of 49 and maximum of 250. If has_next is true, additional orders are available to be fetched with pagination and the cursor value in the response can be passed as cursor parameter in the subsequent request.
 
 You must enter a limit number.
-(hint: If you enter 0 it will return all accounts or 250 whichever is less.)
+(hint: If you enter 0 it will return all accounts or up to 250 whichever is less.)

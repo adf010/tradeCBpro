@@ -438,7 +438,7 @@ fi
     i=0
     ;;
     3)
-#  NOT FINISHED  WORKS  TODO: contract_expiry_type & expiring_contract_status & other ####
+####  NOT FINISHED  WORKS  ####
 ###########################################################################
 # GET LIST PRODUCTS
 # GET https://api.coinbase.com/api/v3/brokerage/products
@@ -446,6 +446,9 @@ fi
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getproducts
 ###########################################################################
 # Get a list of the available currency pairs for trading.
+
+# TODO: add limit, offset, product_type, product_ids, contract_expiry_type, expiring_contract_status, get_tradability_status, get_all_products
+
 
 clear
 columns=$(tput cols)
@@ -504,12 +507,17 @@ echo
   fold  -w "$columns" -bs  DOCS/get_product.txt
 
     method="GET"
-    requestpath="/api/v3/brokerage/products"
+    requestpath="/api/v3/brokerage/products/${product_id1}"
     product_id="product_id"
+    tradability_status0=""
+    tradability_status1="true"
+
     read -p "Enter desired product ( BTC-USD ) : " product_id1
+    read -p "Enter true or false for tradability status : " tradability_status1
     product_id1=${product_id1^^}
 
-   BODY="${qmark}${product_id}${eq1}${product_id1}"
+   requestpath="/api/v3/brokerage/products/${product_id1}"
+   BODY="${qmark}${tradability_status0}${eq1}${tradability_status1}"
 
     TIMESTAMP=$(date +%s)
     SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
@@ -607,7 +615,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
     i=0
     ;;
     6)
-#   NOT FINISHED
+#
 #############################################################################
 # GET MARKET TRADES
 # GET https://api.coinbase.com/api/v3/brokerage/products/{product_id}/ticker
@@ -629,7 +637,7 @@ end0="end"
 start1=""
 end1=""
 
-read -p "Enter product ID : " product_id1
+read -p "Enter product ID (ex. BTC-USD) : " product_id1
 read -p "Enter limit : " limit1
 echo "Format start time as mm/dd/yyyy hh:mm (OR mm/dd/yyyy) "
 read -p "Enter start date/time : " start1

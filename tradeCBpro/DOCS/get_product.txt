@@ -2,6 +2,10 @@ GET PRODUCT
 
 Get information on a single product by product ID.
 
+Tradability_status :
+Whether or not to populate view_only with the tradability status of the product. This is only enabled for SPOT products.
+
+
 
 
 
