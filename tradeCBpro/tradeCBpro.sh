@@ -96,10 +96,6 @@ colon=":"
 comma=","
 fslash="/"
 limit="limit"
-#method=""
-#BODY=""
-#requestpath=""
-
 
 ## Print selection menu.
 showMenu(){
@@ -448,7 +444,6 @@ fi
 # Get a list of the available currency pairs for trading.
 
 # TODO: add limit, offset, product_type, product_ids, contract_expiry_type, expiring_contract_status, get_tradability_status, get_all_products
-
 
 clear
 columns=$(tput cols)
@@ -831,12 +826,6 @@ BODY="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"$
 
  BODYLGTC="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote2}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
 
-#echo $BODY
-#read -p "market " n
-#echo $BODYLGTC
-#read -p "limit" n
-#read -p "STOP" n
-
 if [[ ${orderconfig0} == "limit_limit_gtc" ]]; then
 BODY=${BODYLGTC}
 fi
@@ -941,9 +930,6 @@ TIMESTAMP=$(date +%s)
  lines=$(tput lines)
  fold  -w "$columns" -bs  DOCS/edit_order.txt
  echo
-#curl -L -X POST 'https://api.coinbase.com/api/v3/brokerage/orders/edit' \
-#-H 'Content-Type: application/json' \
-#--data-raw "'{"${order}":"${order_id1}","${price}":"${price1}","${size0}":"${size1}"}'"
 
  size0="size"
  size1=""
@@ -1156,8 +1142,6 @@ echo
 
 ##   TODO ADD OPTIONS
 # trade_ids
-# start_sequence_timestamp # trade time: 2024-08-21T21:20:54.193Z
-#                           "sequence_timestamp": "2024-08-21T21:20:54.244865Z"
 # allowed by  ISO 8601 and RFC 3339    2020-12-09T16:09:53+00:00
 # end_sequence_timestamp
 # sort_by
@@ -1182,7 +1166,6 @@ sort_by0="sort_by"
 sort_by1=""
 method="GET"
 requestpath="/api/v3/brokerage/orders/historical/fills"
-#page1=""
 PATH0="$PWD"/CB-output.json
 rm "$PWD"/CB-output.json
 touch "$PWD"/CB-output.json
@@ -1196,17 +1179,11 @@ read -p "Enter limit of filled orders to display  : " limit1
 while true; do
   read -p "Enter the Product id (required) (ex. BTC-USD) " product_id1; product_id1=${product_id1^^}
 
-
   # "trade_time": "2024-08-21T21:20:54.193Z",   <-- from output
-
-# s_s_timestamp1="2024-08-21T21:20:54.193Z"
-# e_s_timestamp1="2024-08-21T21:20:54.193Z"
 
 page0=$(cat $PATH0 | grep -w cursor | tr -d '"' | sed 's/,*$//g' | sed 's/cursor://' | tr -d " ")
 
 #  ${amps}${s_s_timestamp0}${eq1}${s_s_timestamp1}${amps}${e_s_timestamp0}${eq1}${e_s_timestamp1}
-
-
 
 BODY="${limit0}${eq1}${limit1}${amps}${cursor0}${eq1}${page0}${amps}${retail_portfolio_id0}${eq1}${retail_portfolio_id1}${amps}${prod_id0}${eq1}${product_id1}"
 echo ${BODY}
@@ -1295,12 +1272,9 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/preview_order.txt
 echo
 
-
 # curl -L 'https://api.coinbase.com/api/v3/brokerage/orders/preview' \
 # -H 'Content-Type: application/json' \
 # -d '{"product_id":"btc-osd","side":"SELL","order_configuration":{"limit_limit_gtc":{"base_size":".014","limit_price":"61275.00","post_only":true}}}'
-
-
 
 product_id=
 side=
@@ -1481,7 +1455,7 @@ BODY="${qmark}"
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
 $editor CB-output.json
 
-
+#####################################################################################
     i=0
     ;;
     4)
@@ -1520,15 +1494,11 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/get_public_products_candles.txt
 echo
 
-
-
 # TODO ADD OTHER OPTIONS
-
 
 ( curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD/candles' \
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
  $editor CB-output.json
-
 
 ###################################################################################
      i=0
@@ -1541,7 +1511,6 @@ echo
 # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products/BTC-USD/ticker' \
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getmarkettrades
 ##############################################################################################
-
 # Get snapshot information, by product ID, about the last trades (ticks), best bid/ask, and 24h volume.
 clear
 columns=$(tput cols)
@@ -1549,7 +1518,6 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/get_public_matket_trades.txt
 echo
 
-# TODO ADD OTHER OPTIONS
 
 
 ( curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products/BTC-USD/ticker' \
@@ -1856,7 +1824,6 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/list_deposits.txt
 echo
 
-
 # curl https://api.coinbase.com/v2/accounts/2bbf394c-193b-5b2a-9155-3b4732659ede/deposits \
 
 deposits_id=""
@@ -1966,9 +1933,6 @@ TIMESTAMP=$(date +%s)
 #    "payment_method": "83562370-3e5c-51db-87da-752af5ab9559"
 #  }'
 
-
-
-
 ##################################################################################
    i=0
    ;;
@@ -2050,12 +2014,6 @@ echo
 
 # curl https://api.coinbase.com/v2/accounts/123/withdrawals/321 /
 #
-
-
-
-
-
-
 
 
 
@@ -2399,10 +2357,6 @@ fold  -w "$columns" -bs  DOCS/remove_info.txt
 echo
 
 read -p "This section does nothing at this time. Press ENTER to exit : " n
-
-
-
-
 
 
  #####################################################################
