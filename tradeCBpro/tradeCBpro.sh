@@ -35,10 +35,10 @@ cd "${0%/*}"
 # TODO:
 # Complete getting all calls to at least work in a basic mode.
 # Add available options to calls.
-# Add use of CDP keys.
 # Finish DOCS.
 # Reduce code.
 # Complete converting script to dynamic.
+# Add use of CDP keys.
 ##############################################################################
 ##############################################################################
 # F O L D #
@@ -175,7 +175,6 @@ retail_portfolio_id0="retail_portfolio_id"
 retail_portfolio_id1=""
 limit0=""
 cursor0="cursor"
-#page1=""
 PATH0="$PWD"/CB-output.json
 rm "$PWD"/CB-output.json
 touch "$PWD"/CB-output.json
@@ -1515,7 +1514,7 @@ echo
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs DOCS/get_public_matket_trades.txt
+fold -w "$columns" -bs DOCS/get_public_market_trades.txt
 echo
 
 
@@ -2028,7 +2027,6 @@ echo
 done
 echo -e '\E[32;40m'"\033[1m"
 ######################################################################
-## DO NOT CHANGE BELOW
 printf "\n"
   #fi
   showMenu
@@ -2280,12 +2278,6 @@ if read -r -N 1 -t 5; then
 
 done
 
-#for pc in $(seq 1 100); do
-#    echo -ne "$pc%\033[0K\r"
-#    sleep 1
-#done
-echo
-
 ###############################################################################
     i=0
     ;;
@@ -2392,7 +2384,12 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     ;;
 
     1)
+    clear
     echo " Calculate BTC to USD "
+    echo
+    #columns=$(tput cols)
+    #lines=$(tput lines)
+    #fold  -w "$columns" -bs  DOCS/btc2usd.txt
     BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     echo "BTC = $"$BTCBTC
     read -p " Enter the BTC amount you want to buy/sell : " c
@@ -2649,6 +2646,8 @@ echo "two"
  #   echo
 
  #   read -p " " n
+
+ # curl -L 'https://api.coinbase.com/api/v3/brokerage/key_permissions' \
 
 
 ###################################################################################
