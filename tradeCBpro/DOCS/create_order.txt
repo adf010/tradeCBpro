@@ -20,4 +20,4 @@ Change order type to limit. ENTER 2 for quote/base amount for 2 DOGE. ENTER a li
 Limit_gtc SELL:
 Change order type to limit. Change side to sell. ENTER 2 for quote/base amount for 2 DOGE. ENTER a limit price to a couple cents more than the bid/ask prices.
 
-There are 3 stops for you to double check info. You can ignore the brackets and quotes. those are to keep the server happy :)
+There are 2 stops for you to double check info. You can ignore the brackets and quotes. those are to keep the server happy :)

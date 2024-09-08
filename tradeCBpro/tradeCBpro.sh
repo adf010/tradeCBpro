@@ -191,7 +191,7 @@ BODY="${limit}${eq1}${limit0}${amps}${cursor0}${eq1}${page0}${amps}${retail_port
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -718,10 +718,7 @@ read -p "Enter a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" x
     ;;
 
     1)
-   # TODO:  Add Options
-###############################################################################################
-## BUY/SELL
-#############################################################################################
+ #############################################################################################
 #  ORDERS
 # POST https://api.coinbase.com/api/v3/brokerage/orders
 # curl -L -X POST 'https://api.coinbase.com/api/v3/brokerage/orders' \
@@ -740,6 +737,11 @@ echo
  post1=""
  method="POST"
 
+  basequote1=("quote_size" "base_size")
+  side1=("BUY" "SELL")
+  post1=("true" "false")
+
+
  orderconfig1=("market_market_ioc" "limit_limit_gtc" "limit_limit_gtd")
   read -p "Is this a MARKET or LIMIT order?  Default = [market]:" orderconfig ; orderconfig=${orderconfig:-market}
   orderconfig=${orderconfig,,}
@@ -748,13 +750,10 @@ echo
   orderconfig0=${orderconfig1[dow-0]}
   elif [[ "$orderconfig" == "limit" ]]; then
   orderconfig0=${orderconfig1[dow-2]}
+  #basequote0=${basequote1[dow-1]}
   elif [[ "$orderconfig" == "limit2" ]]; then
   orderconfig0=${orderconfig1[dow-1]}
   fi
-
-  basequote1=("quote_size" "base_size")
-  side1=("BUY" "SELL")
-  post1=("true" "false")
 
   read -p "Is this a BUY or SELL order? Default = [BUY]:" side1 ; side1=${side1:-BUY}
   side1=${side1^^}
@@ -762,20 +761,21 @@ echo
   basequote0=${basequote1[dow-0]}
   if [[ $side1 == "SELL" ]]; then
   side0=${side1[dow-1]}
-  basequote0=${basequote1[dow-2]}
+  basequote0=${basequote1[dow-1]}
   fi
 
     while true; do
-  #  read -p "Which market would you like Default = [BTC-USD]:" prod_id ; prod_id=${prod_id:-BTC-USD}
     read -p "Which market would you like Default = [DOGE-USD]:" prod_id ; prod_id=${prod_id:-DOGE-USD}
+    prod_id=${prod_id^^}
     BTCPRICE=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     PRODPRICE=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
-    echo "The current price of "$prod_id" is "$PRODPRICE" ."
+    echo "The current price of "$prod_id" is "$PRODPRICE"    ."
     curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | jq .
     echo -e '\E[32;40m'"\033[1m"
 
+
     echo "quote=BUY only / base=BUY or SELL"
-    read -p "Enter QUOTE or BASE amount :" quantity
+    read -p "Enter QUOTE(buy) or BASE(sell) amount :" quantity
     if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
     read -p "Enter Limit price: " limit_price1
     fi
@@ -783,17 +783,20 @@ echo
     echo "This is a "${orderconfig0}" "${side0^^}" order."
     echo "You entered (read carefully):"
     echo "market= " $prod_id
+    prod_id=${prod_id^^}
     echo "quote/base amount= " $quantity
+
 
     price1=$(echo $quantity*$PRODPRICE | bc)
 
+    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
     read -p "Post only (true or false) Default = [true]:" post1 ; post1=${post1:-true}
-
     post1=${post1,,}
     post0=${post1[dow-0]}
-
-    if [[ $post1 == "false" ]]; then
+    basequote0=${basequote1[dow-1]}
+    elif [[ $post1 == "false" ]]; then
     post0=${post1[dow-1]}
+    basequote0=${basequote1[dow-1]}
     fi
 
     echo "price=  ~" $price1 " + fee"
@@ -823,7 +826,7 @@ PROD_ID=${prod_id}
 
 BODY="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\"}}}"
 
- BODYLGTC="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote2}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
+ BODYLGTC="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
 
 if [[ ${orderconfig0} == "limit_limit_gtc" ]]; then
 BODY=${BODYLGTC}
@@ -833,7 +836,7 @@ echo $BODY
 read -p "Last chance to check your information. Press ENTER if satisfied else <CTRL> c " n
 
 TIMESTAMP=$(date +%s)
-SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${qmark}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
 urleq="${BENDPOINT}${requestpath}"
 
@@ -843,11 +846,11 @@ urleq="${BENDPOINT}${requestpath}"
  --header "CB-ACCESS-SIGN: $SIG" \
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
- --header "CB-VERSION: $CBVERSION" \
+ --header "CB-VERSION: 2017-12-01" \
  --data-raw "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
 
-##################################################################################################
+##################################################################################
     i=0
     ;;
     2)
@@ -884,7 +887,7 @@ while read line
     lines+=(\""$line"\",)
     order_array=("${order_array[@]}" \""$lines"\",)
     order_array=( "${order_array[@]}" )
-    new_order_array[$k]=$(echo ${order_array[$k]})
+    new_order_array[$k]=$(echo ${order_ids}${eq1}${order_array[$k]}${amps})
     k=$(expr $k + 1)
     line=""
    done
@@ -2648,6 +2651,18 @@ echo "two"
  #   read -p " " n
 
  # curl -L 'https://api.coinbase.com/api/v3/brokerage/key_permissions' \
+
+ echo "$JWT"
+
+ read -p " " n
+
+
+(curl -H "Authorization: Bearer $JWT" "https://api.coinbase.com/api/v3/brokerage/key_permissions" | jq . > CB-output.json )
+  nano CB-output.json
+
+
+
+read -p "" n
 
 
 ###################################################################################

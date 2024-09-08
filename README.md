@@ -1,8 +1,12 @@
 # tradeCBpro
 Buy, Sell or Trade on Coinbase© 
 
+UPDATE 9/8/2024 - NOTICE : I realized that I uploaded the wrong copy of tradeCBpro to Github. Some things that worked before may or may not work as I am bad at backing up. I am now using a local git repo to avoid this happening again.
+ 
+_________________________________________________________________________________________
 
-~~Although usable, some options are not available yet (EX. Only "MARKET" BUY and SELL is available, "LIMIT" coming soon).~~ UPDATE- Limit is working. Test first by buying and/or selling a couple DOGE. Other calls and more options will be added soon.
+
+ UPDATE- Limit is working. Test first by buying and/or selling a couple DOGE. Other calls and more options will be added soon.
 
 The script is well documented with Coinbase© links to each API call included in the script.
 
@@ -28,7 +32,7 @@ I appreciate any and all feedback. Suggestions, PR's, issues, questions, etc. ar
 WHAT WORKS
 List Acounts
 Get Account
-Best Bid/Ask
+Best Bid/Ask (only options 1 and 2)
 Product Book
 
 Create Order (market and limit_gtc only)
