@@ -51,6 +51,8 @@ editor=nano
 ###############################################################################
 ## Set key and secret.
 ######################
+# To use instant sign-in put key and secret in the 2 files
+# below by using option 8 on the menu.
 COINBASE_KEY=`cat wCB-KEY1.txt`
 COINBASE_SECRET=`cat wCB-KEY2.txt`
 # ANOTHER, MORE SECURE METHOD TO ENTER API KEYS
@@ -112,7 +114,7 @@ echo "===================================="
   echo "[5]  PAYMENT METHODS"
   echo "[6]  DEPOSIT/WITHDRAW"
   echo "[7]  PORTFOLIO"
-  echo "[8]  Not Used"
+  echo "[8]  ENTER/DELETE KEYS"
   echo "[9]  Not Used"
   echo "[10] Miscellaneous"
   echo "===================================="
@@ -854,7 +856,7 @@ urleq="${BENDPOINT}${requestpath}"
     i=0
     ;;
     2)
-#####################################################################################
+ #####################################################################################
 # POST CANCEL ORDER(S)
 # POST https://api.coinbase.com/api/v3/brokerage/orders/batch_cancel
 # curl -L -X POST 'https://api.coinbase.com/api/v3/brokerage/orders/batch_cancel' \
@@ -867,7 +869,7 @@ lines=$(tput lines)
 fold  -w "$columns" -bs  DOCS/cancel_orders.txt
 
  method="POST"
- order_ids="order_ids"
+ order_ids0="order_ids"
  requestpath="/api/v3/brokerage/orders/batch_cancel"
 
 declare -a order_array
@@ -887,17 +889,13 @@ while read line
     lines+=(\""$line"\",)
     order_array=("${order_array[@]}" \""$lines"\",)
     order_array=( "${order_array[@]}" )
-    new_order_array[$k]=$(echo ${order_ids}${eq1}${order_array[$k]}${amps})
+    new_order_array[$k]=$(echo ${order_array[$k]}${comma})
     k=$(expr $k + 1)
     line=""
    done
 
-BODY1=$(echo ${new_order_array[*]} | sed 's/,$//g' | tr -d ' ' )
-BODY="{\"${order_ids}\":[${BODY1}]}"
-
-echo $BODY1
-echo $BODY
-read -p " BODIES " n
+BODY1=$(echo ${new_order_array[*]} | sed 's/,$//g' | tr -d ' ' | sed 's/\(.*\),/\1 /' | sed 's/,\{2,\}/,/g' | tr -d ' ' )
+BODY="{\"${order_ids0}\":[${BODY1}]}"
 
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
@@ -912,6 +910,7 @@ TIMESTAMP=$(date +%s)
  -d "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
 
+################################################################################################
 #################################################################################################
     i=0
     ;;
@@ -2135,16 +2134,98 @@ echo -e '\E[32;40m'"\033[1m"
     elif [[ "$ENDPOINT" == "$ENDPOINT3" ]]; then
  #####################################################################
  #
+   i=1
+    j=1
+###################################################
+while [ $j = 1 ] ; do
+clear
+echo -e '\E[32;40m'"\033[1m"
+echo "ENTER/REMOVE KEYS"
+echo -e '\E[33;40m'"\033[1m"
+echo "Main Menu       = 0"
+echo "Create Keys     = 1"
+echo "Remove Keys     = 2"
+echo
+read -p "Enter your choice [0, 1, 2] :" x
+
+   case $x in
+
+    0) clear
+    echo -ne '\n' | showMenu
+    #$x=$0
+    j=0
+    i=0
+    ;;
+#######################################################################
+    1) # Create Keys
+
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold  -w "$columns" -bs  DOCS/create_keys.txt
+    echo
+    read -p "Press ENTER to continue " n
+
+    $editor wCB-KEY1.txt
 
 
- echo " # eight "
+    $editor wCB-KEY2.txt
 
+    read -p "Press ENTER to continue " n
 
-###########################################################################################
+##############################################################################
+    i=0
+    ;;
+    2)
+###########
+  clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold  -w "$columns" -bs  DOCS/remove_keys.txt
+    echo
+    WARN="WARNING!!!"
+    read -p "Press ENTER to continue " n
+    echo
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO DELETE YOUR KEYS y/n : " yn
+
+case $yn in
+        [Yy]* )
+        echo -e '\E[32;40m'"\033[1m"
+
+        rm wCB-KEY1.txt
+        rm wCB-KEY2.txt
+        touch wCB-KEY1.txt
+        touch wCB-KEY2.txt
+
+        continue;;
+        [Nn]* )
+        break;;
+    esac
+##############################################################################
+     i=0
+    j=0
+    ;;
+    *)
+    i=1;;
+
+  esac
+done
+echo -e '\E[32;40m'"\033[1m"
+
     fi
     printf "\n"
 
-#####  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+##############################################################################
+##### 999999999999999999999999999999999999999999999999999999999
+
+
+
+
+
+
+##############################################################################
+###  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     elif [[ "$m" == "10" ]]; then
     ## Miscellaneous
      i=1
