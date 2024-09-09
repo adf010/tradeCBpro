@@ -84,13 +84,13 @@ ENDPOINT=$ENDPOINT3
 # nonce1=$(date +%s%N | cut -b1-13)                                              # Unix time (current)
 # DATETIME= date -d @$EPOCHTIME                                                  #
 #
-#######################################################################
+##################################################################################################
 # COINBASE™ ENDPOINTS/VARIABLES
-#######################################################################
+##################################################################
 ###          ######## BASE URL #########
 BASEENDPOINT1="https://api.coinbase.com"
 BENDPOINT=$BASEENDPOINT1
-######################################################
+##################################################################
 eq1="="
 amps="&"
 qmark="?"
@@ -219,7 +219,7 @@ case $yn in
 done
 
 #     printf "\n"
-##################################################################################
+##################################################################
     i=0
     ;;
     2)
@@ -254,14 +254,14 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha25
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
 
-#######################################################################
+##################################################################
     i=0
     ;;
     3)
-#######################################################################
+##################################################################
 echo "You can add a command here if you want :)"
 
-###################################################################################
+##################################################################
     i=0
     ;;
     *)
@@ -380,7 +380,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
 
-##################################################################################
+##################################################################
     i=0
     ;;
     2)
@@ -431,7 +431,7 @@ fi
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
 
-###########################################################################
+###################################################################
     i=0
     ;;
     3)
@@ -485,7 +485,7 @@ echo
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
-######################################################################################
+##################################################################
     i=0
     ;;
     4) # TODO:  NEED TO ADD TRADABILITY
@@ -526,7 +526,7 @@ echo
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
     $editor CB-output.json
-#######################################################################################
+##################################################################
     i=0
     ;;
     5)
@@ -607,7 +607,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 
  $editor CB-output.json
 
-############################################################################
+##################################################################
     i=0
     ;;
     6)
@@ -664,8 +664,11 @@ BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
 
-###################################################################################
-###################################################################################
+    i=0
+    ;;
+    7)
+##################################################################
+##################################################################
    clear
    i=0
     ;;
@@ -678,7 +681,7 @@ done
  fi
 
     printf "\n"
-#####  33333333333333333333333333333333333333333333333333333333333333333333
+#####  33333333333333333333333333333333333333333333333333333333333
     elif [[ "$m" == "3" ]]; then
     if [[ "$ENDPOINT" == "$ENDPOINT1" ]]; then
     printf "\n"
@@ -687,10 +690,10 @@ done
     echo -e '\E[31;40m'"\033[1m"
     echo -e '\E[32;40m'"\033[1m"
     printf "\n"
-###########################################################
+##################################################################
     elif [[ "$ENDPOINT" == "$ENDPOINT3" ]]; then
 ######   ORDER BUY/SELL
-#########################################################################
+##################################################################
 
 i=1
 j=1
@@ -852,7 +855,7 @@ urleq="${BENDPOINT}${requestpath}"
  --data-raw "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
 
-##################################################################################
+###################################################################
     i=0
     ;;
     2)
@@ -910,8 +913,8 @@ TIMESTAMP=$(date +%s)
  -d "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
 
-################################################################################################
-#################################################################################################
+###################################################################
+###################################################################
     i=0
     ;;
     3)
@@ -961,7 +964,7 @@ TIMESTAMP=$(date +%s)
  --data-raw ${BODY} | jq -r . > CB-output.json )
  $editor CB-output.json
 
-##########################################################################################
+###################################################################
     i=0
     ;;
     4)
@@ -1121,11 +1124,11 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json)
   $editor CB-output.json
 
-#######################################################################################
+###################################################################
     i=0
     ;;
     6)
-    #   NOT FINISHED    TODO: OPTIONS      ##########################
+    #   NOT FINISHED    TODO: OPTIONS      ########################
 #########################################################################################
 #####   LIST FILLS
 #########################################################################################
@@ -1215,7 +1218,7 @@ case $yn in
     esac
 done
 
-#######################################################################################
+###################################################################
    i=0
     ;;
     7)
@@ -1253,7 +1256,7 @@ read -p "Enter Order ID : " order_id1
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 $editor CB-output.json
 
-##################################################################################
+###################################################################
     i=0
     ;;
     8)
@@ -1309,16 +1312,8 @@ base_size=
     i=0
     ;;
     9)
-
-
-############################################################################################
-
-
-
-
-
-
-############################################################################################
+###################################################################
+###################################################################
     i=0
     j=0
     ;;
@@ -1331,8 +1326,8 @@ echo -e '\E[32;40m'"\033[1m"
 
 fi
 
-######################################################################
-#####  444444444444444444444444444444444444444444444444444444
+###################################################################
+#####  444444444444444444444444444444444444444444444444444444444444
     elif [[ "$m" == "4" ]]; then
     ##
     if [[ "$ENDPOINT" == "$ENDPOINT1" ]]; then
@@ -1340,7 +1335,7 @@ fi
     elif [[ "$ENDPOINT" == "$ENDPOINT2" ]]; then
     printf "\n"
     elif [[ "$ENDPOINT" == "$ENDPOINT3" ]]; then
- ####################################################################
+ ##################################################################
  i=1
  j=1
 while [ $j = 1 ] ; do
@@ -1388,7 +1383,7 @@ echo
 | jq -r . > CB-output.json )
  $editor CB-output.json
 
-########################################################################################
+###################################################################
     i=0
     ;;
     2)
@@ -1426,7 +1421,7 @@ $editor CB-output.json
      i=0
      ;;
      3)
-#   NOT FINISHED
+     #   NOT FINISHED
 #######################################################################################
 # GET GET PUBLIC PRODUCTS
 # GET https://api.coinbase.com/api/v3/brokerage/market/products
@@ -1443,24 +1438,36 @@ echo
 
 # TODO ADD OTHER OPTIONS
 
-product_ids="product_ids"
-product_id1=""
-requestpath="/api/v3/brokerage/market/products"
+    method="GET"
+    offset="offset"
+    product_type="product_type"
+    product_id="product_id"
+    contract_expiry_type="contract_expiry_type"
+    expiring_contract_status="expiring_contract_status"
+    limit1=""
+    offset1=""
+    product_type1=""
+    product_id1=""
+    contract_expiry_type1=""
+    expiring_contract_status=""
+    requestpath="/api/v3/brokerage/market/products"
 
-read -p "Enter Product ID (BTC-USD): " product_id1
-product_id1=${product_id1^^}
+    read -p "Enter Product id(s) (BTC-USD) : " product_id1
+    product_id1=${product_id1^^}
+    read -p "Enter limit of how many products to return : " limit1
 
-BODY="${qmark}"
+    BODY="${qmark}${limit}${eq1}${limit1}${amps}${product_id}${eq1}${product_id1}"
+    echo ${BODY}
+    read -p "Press ENTER to continue: " n
 
-( curl -L -X GET "https://api.coinbase.com/api/v3/brokerage/market/products?product_ids=${product_id1}" \
--H 'Content-Type: application/json' | jq -r . > CB-output.json )
-$editor CB-output.json
-
-#####################################################################################
+    (curl -L -X "GET" "${BENDPOINT}${requestpath}${BODY}" \
+    -H 'Content-Type: application/json' | jq -r . > CB-output.json )
+    $editor CB-output.json
+###################################################################
+###################################################################
     i=0
     ;;
     4)
-#   NOT FINISHED
 ######################################################################################
 # GET PUBLIC PRODUCT
 # GET https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}
@@ -1474,7 +1481,10 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/get_public_product.txt
 echo
 
-( curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD' \
+read -p "Enter product ID (BTC-USD) " product_id1
+product_id1=${product_id1^^}
+
+( curl -L -X GET "https://api.coinbase.com/api/v3/brokerage/market/products/${product_id1}" \
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
 $editor CB-output.json
 
@@ -1501,16 +1511,16 @@ echo
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
  $editor CB-output.json
 
-###################################################################################
+###################################################################
      i=0
      ;;
      6)
 #   NOT FINISHED
 ####################################################################################
 # GET MARKET TRADES
-# GET https://api.coinbase.com/api/v3/brokerage/products/{product_id}/ticker
-# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products/BTC-USD/ticker' \
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getmarkettrades
+# GET https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}/ticker
+# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD/ticker' \
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicmarkettrades
 ##############################################################################################
 # Get snapshot information, by product ID, about the last trades (ticks), best bid/ask, and 24h volume.
 clear
@@ -1519,13 +1529,46 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/get_public_market_trades.txt
 echo
 
+product_id="product_id"
+product_id1=""
+limit="limit"
+limit1=""
+start0="start"
+end0="end"
+start1=""
+end1=""
 
+read -p "Enter product ID (ex. BTC-USD) : " product_id1
+read -p "Enter limit : " limit1
+echo "Format start time as mm/dd/yyyy hh:mm (OR mm/dd/yyyy) "
+read -p "Enter start date/time : " start1
+echo "Format end time as mm/dd/yyyy hh:mm (OR mm/dd/yyyy) "
+read -p "Enter end date/time : " end1
+start1=$(date -u -d "$start1" +%s)
+end1=$(date -u -d "$end1" +%s)
 
-( curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products/BTC-USD/ticker' \
--H 'Content-Type: application/json' | jq -r . > CB-output.json )
-$editor CB-output.json
+if [[ "${start1}" = "" ]]; then
+BODY="$BODY0"
+fi
 
-#############################################################################################
+method="GET"
+requestpath="/api/v3/brokerage/market/products/${product_id1^^}/ticker"
+
+BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end0}${eq1}${end1}"
+
+ TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+ echo ${TIMESTAMP}
+
+(curl -L -X "${method}" "${BENDPOINT}${requestpath}${BODY}" \
+ -H 'Content-Type: application/json' | jq -r . > CB-output.json )
+ $editor CB-output.json
+
+    i=0
+     ;;
+     7)
+###################################################################
+###################################################################
     i=0
     j=0
     ;;
@@ -1535,7 +1578,7 @@ $editor CB-output.json
   esac
 done
 echo -e '\E[32;40m'"\033[1m"
-#####################################################################################
+###################################################################
   printf "\n"
   fi
 ##### 5555555555555555555555555555555555555555555555555555555555555
@@ -1575,7 +1618,7 @@ read -p "Type a number [0, 1, 2] :" x
     ;;
 
     1)
-#    NOT FINISHED   TODO: doc #########################################################################
+#    NOT FINISHED   TODO: doc #############################################
 ###########################################################################
 # GET LIST PAYMENT METHODS
 # GET https://api.coinbase.com/api/v3/brokerage/payment_methods
@@ -1608,11 +1651,11 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 $editor CB-output.json
 
-##########################################################################################
+###################################################################
     i=0
     ;;
     2)
-#   NOT FINISHED   TODO: doc ###########################################################################
+#   NOT FINISHED   TODO: doc ##############################################
 ###########################################################################
 # GET GET PAYMENT METHOD
 # https://api.coinbase.com/api/v3/brokerage/payment_methods/{payment_method_id}
@@ -1645,7 +1688,11 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 $editor CB-output.json
 
-###################################################################################
+    i=0
+    ;;
+    2)
+###################################################################
+###################################################################
     i=0
     j=0
     ;;
@@ -1654,14 +1701,12 @@ $editor CB-output.json
   esac
 done
 
-##############################################################################################
-########################################################################################
-## DO NOT CHANGE BELOW
-#printf "\n"
+###################################################################
+###################################################################
    echo -e '\E[32;40m'"\033[1m"
    fi
 #   printf "\n"
-  #####  6666666666666666666666666666666666666666666666666666
+  #####  6666666666666666666666666666666666666666666666666666666666
     elif [[ "$m" == "6" ]]; then
     ##
     if [[ "$ENDPOINT" == "$ENDPOINT1" ]]; then
@@ -1705,7 +1750,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6, 7, 8] :" x
 
     1)
 #    TODO: v3 version
-##########################################################################################
+######################################################################
  #####################################################################
  # POST DEPOSIT
  # POST https://api.coinbase.com/v2/accounts/:account_id/deposits/:deposit_id/commit
@@ -1759,7 +1804,7 @@ echo
   --data-raw "${BODY}" | jq . > CB-output.json )
   $editor CB-output.json
 
- ######################################################################
+ ####################################################################
     i=0
     ;;
     2)
@@ -1776,48 +1821,42 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/commit_deposit.txt
 echo
 
-# curl https://api.coinbase.com/v2/accounts/82de7fcd-db72-5085-8ceb-bee19303080b/deposits/a333743d-184a-5b5b-abe8-11612fc44ab5/commit /
-#  -X POST \
+read -p "Not Finished. Press ENTER to exit. " n
+# Section below is from list deposits.
+#####################################################################
+
+ #deposits_id=""
+ #method="GET"
+
+#read -p "Enter Deposit Account UUID: " deposits_id
+#requestpath="/v2/accounts/${deposits_id}/deposits"
+
+#TIMESTAMP=$(date +%s)
+# SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+#(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
+#  -X ${method} \
+#  -H 'Content-Type: application/json' \
+#  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+#  --header "CB-ACCESS-SIGN: $SIG" \
+#  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+#  --header "CB-VERSION: $CBVERSION" \
+#       | jq . > CB-output.json )
+#  $editor CB-output.json
+#####################################################################
 
 
 
-
-
-# Section below is list deposits.
-#################################################################################
-
- deposits_id=""
- method="GET"
-
-read -p "Enter Deposit Account UUID: " deposits_id
-requestpath="/v2/accounts/${deposits_id}/deposits"
-
-TIMESTAMP=$(date +%s)
- SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
-
-(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
-  -X ${method} \
-  -H 'Content-Type: application/json' \
-  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
-  --header "CB-ACCESS-SIGN: $SIG" \
-  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
-  --header "CB-VERSION: $CBVERSION" \
-       | jq . > CB-output.json )
-  $editor CB-output.json
-####################################################################################
-
-
-
-################################################################################
+#####################################################################
     i=0
     ;;
     3)
     # LIST DEPOSITS
-##################################################################################
+#####################################################################
 # GET https://api.coinbase.com/v2/accounts/:account_id/deposits
 #
 # https://docs.cdp.coinbase.com/coinbase-app/docs/api-deposits
-##################################################################################
+#####################################################################
 # Lists fiat deposits for an account.
 clear
 columns=$(tput cols)
@@ -1846,7 +1885,7 @@ TIMESTAMP=$(date +%s)
        | jq . > CB-output.json )
   $editor CB-output.json
 
-##################################################################################
+#####################################################################
     i=0
     ;;
     4)
@@ -1863,21 +1902,21 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/show_deposit.txt
 echo
 
-
+# example
 # curl https://api.coinbase.com/v2/accounts/2bbf394c-193b-5b2a-9155-3b4732659ede/deposits/67e0eaec-07d7-54c4-a72c-2e92826897df /
 
 
 
-##################################################################################
+#####################################################################
    i=0
    ;;
    5)
    # WITHDRAW FUNDS
-##################################################################################
+#####################################################################
 # POST https://api.coinbase.com/v2/accounts/:account_id/withdrawals
 #
 # https://docs.cdp.coinbase.com/coinbase-app/docs/api-withdrawals
-##################################################################################
+#####################################################################
 # Withdraws a user-defined amount of funds from a fiat account.
 clear
 columns=$(tput cols)
@@ -1934,7 +1973,7 @@ TIMESTAMP=$(date +%s)
 #    "payment_method": "83562370-3e5c-51db-87da-752af5ab9559"
 #  }'
 
-##################################################################################
+#####################################################################
    i=0
    ;;
    6)
@@ -1951,23 +1990,23 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/commit_withdrawal.txt
 echo
 
-
+# example
 # curl https://api.coinbase.com/v2/accounts/82de7fcd-db72-5085-8ceb-bee19303080b/withdrawals/a333743d-184a-5b5b-abe8-11612fc44ab5/commit /
 
 
 
 
 
-##################################################################################
+#####################################################################
   i=0
    ;;
    7)
    # LIST WITHDRAWALS
-##################################################################################
+#####################################################################
 # GET https://api.coinbase.com/v2/accounts/:account_id/withdrawals
 #
 # https://docs.cdp.coinbase.com/coinbase-app/docs/api-withdrawals
-##################################################################################
+#####################################################################
 # Lists withdrawals for an account.
 clear
 columns=$(tput cols)
@@ -1994,7 +2033,7 @@ TIMESTAMP=$(date +%s)
        | jq . > CB-output.json )
   $editor CB-output.json
 
-##################################################################################
+#####################################################################
   i=0
   ;;
   8)
@@ -2018,7 +2057,7 @@ echo
 
 
 
-###################################################################################
+#####################################################################
     i=0
     j=0
     ;;
@@ -2124,7 +2163,7 @@ echo -e '\E[32;40m'"\033[1m"
 
     fi
     printf "\n"
-#####################################################################     #   #88888888888888888888888888888888888888888888888888888888888888888888888888
+#####################################################################   #88888888888888888888888888888888888888888888888888888888888888888888
     elif [[ "$m" == "8" ]]; then
 
     if [[ "$ENDPOINT" == "$ENDPOINT1" ]]; then
@@ -2132,11 +2171,11 @@ echo -e '\E[32;40m'"\033[1m"
     elif [[ "$ENDPOINT" == "$ENDPOINT2" ]]; then
     printf "\n"
     elif [[ "$ENDPOINT" == "$ENDPOINT3" ]]; then
- #####################################################################
+ ####################################################################
  #
    i=1
     j=1
-###################################################
+#####################################################################
 while [ $j = 1 ] ; do
 clear
 echo -e '\E[32;40m'"\033[1m"
@@ -2156,7 +2195,7 @@ read -p "Enter your choice [0, 1, 2] :" x
     j=0
     i=0
     ;;
-#######################################################################
+#####################################################################
     1) # Create Keys
 
     clear
@@ -2173,7 +2212,7 @@ read -p "Enter your choice [0, 1, 2] :" x
 
     read -p "Press ENTER to continue " n
 
-##############################################################################
+#####################################################################
     i=0
     ;;
     2)
@@ -2202,7 +2241,7 @@ case $yn in
         [Nn]* )
         break;;
     esac
-##############################################################################
+#####################################################################
      i=0
     j=0
     ;;
@@ -2216,16 +2255,16 @@ echo -e '\E[32;40m'"\033[1m"
     fi
     printf "\n"
 
-##############################################################################
-##### 999999999999999999999999999999999999999999999999999999999
+#####################################################################
+##### 999999999999999999999999999999999999999999999999999999999999999
 
 
 
 
 
 
-##############################################################################
-###  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+#####################################################################
+###  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     elif [[ "$m" == "10" ]]; then
     ## Miscellaneous
      i=1
@@ -2286,7 +2325,7 @@ read -p "Press ENTER to close window. " y
     i=0
     ;;
     4)
-########################################################################################
+#####################################################################
 #
  # Live TICKER
     clear
@@ -2324,11 +2363,11 @@ done
 
 
 
-######################################################################
+#####################################################################
    i=0
     ;;
     5)
-    #########################################################################
+    #################################################################
     #
     # Live Stats
 
@@ -2362,7 +2401,7 @@ if read -r -N 1 -t 5; then
 
 done
 
-###############################################################################
+#####################################################################
     i=0
     ;;
     6) ## My Notes
@@ -2382,7 +2421,7 @@ done
     ;;
     7)
  echo "7"
-#######################################################################################
+##############################################################################
 # https://docs.cdp.coinbase.com/advanced-trade/docs/rest-api-auth  *****
 # https://docs.cdp.coinbase.com/developer-platform/docs/cdp-vs-legacy-keys *
 #
@@ -2403,11 +2442,11 @@ done
 
 
 
-#######################################################################################
+#####################################################################
     i=0
     ;;
     8)
- #   FAQ    ####################################################################################
+ #   FAQ    #########################################################
 
 clear
 columns=$(tput cols)
@@ -2439,6 +2478,7 @@ read -p "This section does nothing at this time. Press ENTER to exit : " n
     i=0
     ;;
     10)
+######################################################################
     clear
     i=1
     j=1
@@ -2448,14 +2488,14 @@ read -p "This section does nothing at this time. Press ENTER to exit : " n
         echo "                       Quickmafs"
         echo "                       ---------"
         echo
-echo "Main Menu                   = 0"
-echo "Calculate BTC to USD        = 1"
-echo "Calculate Amount of ONION   = 2"
-echo "Calculate BTC Cost          = 3"
-echo "Calculate Amount of BTC     = 4"
-echo "Use Custom BTC Price        = 5"
-echo "Use Amount For Cost         = 6"
-echo "Market buy/sell fee         = 7"
+echo "Main Menu                       = 0"
+echo "Calculate BTC to USD            = 1"
+echo "Calculate Amount of ONION       = 2"
+echo "Calculate BTC Cost              = 3"
+echo "Calculate Amount of BTC         = 4"
+echo "Use Custom BTC Price for Amount = 5"
+echo "Use Custom Amount For Cost      = 6"
+echo "Market buy/sell fee             = 7"
 echo
 read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
 
@@ -2518,8 +2558,8 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     echo
     i=0
     ;;
-    5)    echo " Use Custom BTC Price for USD Cost "
-    read -p " Enter a Price for BTC : " u
+    5)    echo " Use Custom BTC Price to find Amount "
+    read -p " Enter a Custom Price for BTC : " u
     read -p " Enter an Amount of USD : " t
     AmountOfBTC=$(echo "scale=8;$t/$u" | bc )
     echo " Your Amount of BCT = " $AmountOfBTC
@@ -2529,7 +2569,7 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     i=0
     ;;
     6)    echo " Use Custom Price to Find BTC Amount for USD Cost "
-    read -p " Enter a Price for BTC : " s
+    read -p " Enter a Custom Price for BTC : " s
     read -p " Enter an Amount of BTC : " AmountofBTC
     CostOfBTC=$(echo "$s*$AmountofBTC" | bc )
     echo " Your USD Cost = " $CostOfBTC
@@ -2572,7 +2612,7 @@ echo -e '\E[32;40m'"\033[1m"
 
 echo -e '\E[32;40m'"\033[1m"
     printf "\n"
-#####  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+#####  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
     elif [[ "$m" == "11" ]]; then
     ## Choose Exchange
 
@@ -2639,114 +2679,19 @@ read -p "Type a number [0, 1, 2] :" x
 
     1)
 #########################################################################
-####################################################################
-# GET LIST ACCOUNTS
-# GET https://api.coinbase.com/api/v3/brokerage/accounts
-# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/accounts?limit=20&cursor=12345'
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getaccounts
-###########################################################################################
-# LIST Get a list of authenticated accounts for the current user.
-clear
-columns=$(tput cols)
-lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/list_accounts.txt
-echo
-method="GET"
-requestpath="/api/v3/brokerage/accounts"
-retail_portfolio_id0="retail_portfolio_id"
-retail_portfolio_id1=""
-limit0=""
-cursor0="cursor"
-page1=""
-PATH0="$PWD"/CB-output.json
-rm "$PWD"/CB-output.json
-touch "$PWD"/CB-output.json
-echo -e '\E[32;40m'"\033[1m"
-read -p "Enter Retail Portfolio ID or press ENTER for default ID : " retail_portfolio_id1
-read -p "Enter limit of accounts to display  : " limit0
 
-while true; do
-
-page0=$(cat $PATH0 | grep -w name | tr -d '"' | sed 's/,*$//g' | sed 's/cursor://' | tr -d " ")
-
-BODY="${limit}${eq1}${limit0}${amps}${cursor0}${eq1}${page0}${amps}${retail_portfolio_id0}${eq1}${retail_portfolio_id1}"
-
-TIMESTAMP=$(date +%s)
-  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
-
-(curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
-  -X ${method}  \
-  -H 'Content-Type: application/json'  \
-  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
-  --header "CB-ACCESS-SIGN: $SIG" \
-  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
-  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
-  $editor CB-output.json
-
-  #jq '.[] | .name' CB-output.json
-
-echo -e '\E[31;40m'"\033[1m"
-   read -p "Are you finished y/n : " yn
-case $yn in
-        [Yy]* )
-        echo -e '\E[32;40m'"\033[1m"
-        rm "$PWD"/CB-output.json
-        touch "$PWD"/CB-output.json
-        break;;
-        [Nn]* )
-       read -p "Enter limit of accounts to display (required) : " limit0
-
-       echo -e '\E[32;40m'"\033[1m"
-    esac
-    echo -e '\E[32;40m'"\033[1m"
-done
-
-#     printf "\n"
-##################################################################################
+#########################################################################
 
 
-############################################################################################
+#########################################################################
     i=0
     ;;
     2)
-    ########################################################################################
+    #####################################################################
 echo "two"
-#######################################################################################
-# https://docs.cdp.coinbase.com/advanced-trade/docs/rest-api-auth  *****
-# https://docs.cdp.coinbase.com/developer-platform/docs/cdp-vs-legacy-keys *
-#
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getapikeypermissions
+#########################################################################
 
-# curl -L 'https://api.coinbase.com/api/v3/brokerage/key_permissions'
-
-# GET https://api.coinbase.com/api/v3/brokerage/key_permissions
-
-# Get information about your CDP API key permissions
-
- #   clear
- #   columns=$(tput cols)
- #   lines=$(tput lines)
- #   fold  -w "$columns" -bs DOCS/cdp_key_permissions.txt
- #   echo
-
- #   read -p " " n
-
- # curl -L 'https://api.coinbase.com/api/v3/brokerage/key_permissions' \
-
- echo "$JWT"
-
- read -p " " n
-
-
-(curl -H "Authorization: Bearer $JWT" "https://api.coinbase.com/api/v3/brokerage/key_permissions" | jq . > CB-output.json )
-  nano CB-output.json
-
-
-
-read -p "" n
-
-
-###################################################################################
+#########################################################################
     i=0
     ;;
     *)
