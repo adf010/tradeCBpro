@@ -811,12 +811,12 @@ echo
     case $yn in
         [Yy]* ) break;;
         [Nn]* ) continue;;
-        * ) echo "Please answer yes or no.";;
+        * ) echo "Please answer yes or no. ( Or y or n )";;
     esac
   done
     while true; do
      echo -e '\E[31;40m'"\033[1m"
-   read -p "Would you like to execute this transaction?" yn
+   read -p "Would you like to execute this transaction? ( y or n )" yn
     case $yn in
         [Yy]* ) break;;
         [Nn]* ) exec $0;;
@@ -2181,11 +2181,12 @@ clear
 echo -e '\E[32;40m'"\033[1m"
 echo "ENTER/REMOVE KEYS"
 echo -e '\E[33;40m'"\033[1m"
-echo "Main Menu       = 0"
-echo "Create Keys     = 1"
-echo "Remove Keys     = 2"
+echo "Main Menu           = 0"
+echo "Enter Keys          = 1"
+echo "Remove Keys         = 2"
+echo "Remove Private Info = 3"
 echo
-read -p "Enter your choice [0, 1, 2] :" x
+read -p "Enter your choice [0, 1, 2, 3] :" x
 
    case $x in
 
@@ -2215,25 +2216,25 @@ read -p "Enter your choice [0, 1, 2] :" x
 #####################################################################
     i=0
     ;;
-    2)
+    2) # Remove keys
 ###########
-  clear
+    clear
     columns=$(tput cols)
     lines=$(tput lines)
     fold  -w "$columns" -bs  DOCS/remove_keys.txt
     echo
-    WARN="WARNING!!!"
+    #WARN="WARNING!!!"
     read -p "Press ENTER to continue " n
     echo
     echo -e '\E[31;40m'"\033[1m"
-    read -p "ARE YOU SURE YOU WANT TO DELETE YOUR KEYS y/n : " yn
+    read -p "ARE YOU SURE YOU WANT TO DELETE YOUR KEYS? y/n : " yn
 
 case $yn in
         [Yy]* )
         echo -e '\E[32;40m'"\033[1m"
 
-        rm wCB-KEY1.txt
-        rm wCB-KEY2.txt
+        rm -f wCB-KEY1.txt
+        rm -f wCB-KEY2.txt
         touch wCB-KEY1.txt
         touch wCB-KEY2.txt
 
@@ -2241,8 +2242,44 @@ case $yn in
         [Nn]* )
         break;;
     esac
+
+    i=0
+    ;;
+    3) # Remove all sensitve informatio
 #####################################################################
-     i=0
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold  -w "$columns" -bs  DOCS/remove_keys_info.txt
+    echo
+
+echo "This will REMOVE KEYS as well as the CB-output.json file."
+echo "The CB-output.json file is the output you see in response"
+echo "to most of the calls. This file may contain sensitive data"
+echo "such as UUID's for Payment Methods, Fiat wallets, etc."
+
+WARN="WARNING!!!"
+    read -p "Press ENTER to continue " n
+    echo
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO DELETE YOUR KEYS and SENSITIVE info? y/n : " yn
+
+        case $yn in
+        [Yy]* )
+        echo -e '\E[32;40m'"\033[1m"
+
+rm -f wCB-KEY1.txt
+rm -f wCB-KEY2.txt
+rm -f CB-output.json
+touch wCB-KEY1.txt
+touch wCB-KEY2.txt
+
+        continue;;
+        [Nn]* )
+        break;;
+    esac
+
+#####################################################################
     j=0
     ;;
     *)
@@ -2412,10 +2449,17 @@ done
        lines=$(tput lines)
        fold  -w "$columns" -bs  DOCS/notes.txt
        echo
+       echo -e '\E[31;40m'"\033[1m"
+       echo "IT IS STRONGLY ADVISED TO NOT USE THIS OPTION TO STORE SENSITIVE INFORMATION."
+       echo "This file is NOT removed by using the Remove Sensitive Information option."
+       echo -e '\E[32;40m'"\033[1m"
 
-       read -p "Press ENTER to continue:" z
-       #bash -c "xdg-open $USER/CBnotes.txt 2> /dev/null"
-       $editor /home/$USER/CBnotes.txt
+    read -p "Do you want to open the editor? ( y or n ) ?" yn
+    echo -e '\E[32;40m'"\033[1m"
+    if [[ $yn == "y" ]]; then
+        $editor /home/$USER/CBnotes.txt
+        # bash -c "xdg-open /home/$USER/CBnotes.txt
+    fi
 
     i=0
     ;;
