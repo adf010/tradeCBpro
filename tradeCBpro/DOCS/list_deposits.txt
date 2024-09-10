@@ -1,0 +1,5 @@
+LIST DEPOSITS
+
+Lists fiat deposits for an account.
+
+

@@ -182,7 +182,7 @@ rm "$PWD"/CB-output.json
 touch "$PWD"/CB-output.json
 echo -e '\E[32;40m'"\033[1m"
 read -p "Enter Retail Portfolio ID or press ENTER for default : " retail_portfolio_id1
-read -p "Enter limit of accounts to display  : " limit0
+read -p "Enter limit of accounts to display (or 0 for all) : " limit0
 
 while true; do
 
@@ -236,7 +236,7 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/get_account.txt
 echo
 echo
-read -p "Enter Account id : " account_id
+read -p "Enter Account UUID : " account_id
 
 method="GET"
 requestpath="/api/v3/brokerage/accounts/"
@@ -1019,20 +1019,22 @@ fold  -w "$columns" -bs  DOCS/list_orders.txt
 echo
 
 # TODO a bunch
-#${product_id}
-#${order_status}
-#${limit}
-#${start_date}
-#${end_date}
-#${user_native_currency}
-#${order_type}
-#${order_side}
-#${cursor}
-#${product_type}
-#${order_placement_source}
-#${contract_expiry_type}
-#${asset_filters}
-#${retail_portfolio_id}
+#${order_ids}        Optional string of the product ID(s). Defaults to null, or fetch for all products.
+#${product_id}           <--- done
+#${order_status}         Only returns orders matching the specified order statuses.
+#${limit}  The number of orders to display per page (no default amount). If has_next is true, additional pages of orders are available to be fetched. Use the cursor parameter to start on a specified page.
+#${start_date}  (RFC3339 Timestamp)
+#${end_date}    (RFC3339 Timestamp)
+#${user_native_currency} <--- deprecated
+#${order_type}           <--- done
+#${order_side}           <--- done
+#${cursor}              For paginated responses, returns all responses that come after this value.
+#${product_type}      Returns orders matching this product type. By default, returns all product types.
+#${order_placement_source}  Only returns the orders matching this placement source. By default, returns RETAIL_ADVANCED placement source.
+#${contract_expiry_type} <--- Only works for Futures
+#${asset_filters}   Only returns the orders where the quote, base or underlying asset matches the provided asset filter(s) (e.g. 'BTC').
+#${retail_portfolio_id}  <--- deprecated
+#${sort_by}   Sort results by a field, results use unstable pagination. Default is to sort by creation time.
 
 read -p "Press ENTER to continue: " n
 # order_status1=("EXPIRED" "EXPIRED" "EXPIRED")

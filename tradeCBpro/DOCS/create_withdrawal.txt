@@ -1,0 +1,5 @@
+WITHDRAW FUNDS
+
+Withdraws a user-defined amount of funds from a fiat account.
+
+

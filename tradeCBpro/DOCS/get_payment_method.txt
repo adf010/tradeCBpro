@@ -1,0 +1,4 @@
+GET PAYMENT METHOD
+
+Get information about a single payment method for the current user.
+
