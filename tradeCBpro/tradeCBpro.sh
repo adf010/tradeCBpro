@@ -22,6 +22,11 @@ COINBASE_KEY=`cat wCB-KEY1.txt`
 COINBASE_SECRET=`cat wCB-KEY2.txt`
 # ANOTHER, MORE SECURE METHOD TO ENTER API KEYS
 if [[ "$COINBASE_KEY" == "" ]]; then
+echo "Enter KEY at first prompt and SECRET at second prompt to put keys in memory."
+echo "Keys will be 'forgotten' when you exit script. "
+echo "Optionally you can Enter KEY/SECRET into respective files or use the menu "
+echo "option which retains your keys until deleted or using the Remove Keys option."
+echo "If you want to store keys then just press ENTER twice to start script."
 read -p "Enter API key: " COINBASE_KEY
 read -p "Enter API secret: " COINBASE_SECRET
 fi
