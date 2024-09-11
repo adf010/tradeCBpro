@@ -1,0 +1,8 @@
+ENTER KEYS
+
+WARNING!! This option will put your key/secret into 2 respective files. If they are not removed before or after your session ends they will remain in those files until they are deleted manually or by using the Remove Keys utility.
+If you are using a shared computer or device, you may want to store the key/secret in memory. You will need to enter the key/secret each time you start the script but that is better than losing your account. 
+To store the keys in memory, enter your key/secret at the 2 prompts when the script starts.
+
+If you choose to enter your keys: The editor will open twice. paste the key in the first line of the empty file. Do not hit space or Enter, just <CTRL -x> and then "y". Repeat to enter the secret into the second editor window.
+

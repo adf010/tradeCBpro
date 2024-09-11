@@ -13,8 +13,28 @@ cd "${0%/*}"
 ##############################################################################
 ################      IMPORTANT!!!  READ THIS!!!        ######################
 ##############################################################################
+###############################################################################
+## Set key and secret.
+######################
+# To use instant sign-in put key and secret in the 2 files
+# below by using option 8 on the menu.
+COINBASE_KEY=`cat wCB-KEY1.txt`
+COINBASE_SECRET=`cat wCB-KEY2.txt`
+# ANOTHER, MORE SECURE METHOD TO ENTER API KEYS
+if [[ "$COINBASE_KEY" == "" ]]; then
+read -p "Enter API key: " COINBASE_KEY
+read -p "Enter API secret: " COINBASE_SECRET
+fi
+# Set CB-VERSION
+CBVERSION="2017-12-01"
+###### ENDPOINTS #####
+ENDPOINT3="https://api.coinbase.com"
+ENDPOINT=$ENDPOINT3
+#############################################################################
 # To run this script you will need an API KEY and SECRET on exchange.        #
-# You will need to create two files in the same directory as this file.      #
+# You will need to create two files in the same directory as this file       #
+# or choose one of the other options (Keys in memory or use Enter/Remove     #
+# Keys option from menu).                                                    #
 #                                                                            #
 # For Coinbase™ - Copy API KEY to wCB-KEY1.txt and SECRET to wCB-KEY2.txt    #
 #--------------------------------------------------------------------------- #
@@ -45,26 +65,9 @@ cd "${0%/*}"
 # columns=$(tput cols)
 # lines=$(tput lines)
 # fold  -w "$columns" -bs  order_history.txt
-#
+##############################################################################
 #PATH0="/home/$USER/CB-output.json"
 editor=nano
-###############################################################################
-## Set key and secret.
-######################
-# To use instant sign-in put key and secret in the 2 files
-# below by using option 8 on the menu.
-COINBASE_KEY=`cat wCB-KEY1.txt`
-COINBASE_SECRET=`cat wCB-KEY2.txt`
-# ANOTHER, MORE SECURE METHOD TO ENTER API KEYS
-if [[ "$COINBASE_KEY" == "" ]]; then
-read -p "Enter API key: " COINBASE_KEY
-read -p "Enter API secret: " COINBASE_SECRET
-fi
-# Set CB-VERSION
-CBVERSION="2017-12-01"
-###### ENDPOINTS #####
-ENDPOINT3="https://api.coinbase.com"
-ENDPOINT=$ENDPOINT3
 #############       DOCUMENTATION and VARIABLES     ########
 ############################################################
 #              ######## COLORS #########
@@ -2148,11 +2151,47 @@ read -p "Enter your choice [0, 1, 2] :" x
 
     i=0
     ;;
-
     2)
-
+##############################################################################
 echo "nothing yet"
+# https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_deleteportfolio
 
+
+
+
+##############################################################################
+
+# PUT https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
+
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_editportfolio
+
+
+
+##############################################################################
+
+# POST https://api.coinbase.com/api/v3/brokerage/portfolios
+
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_createportfolio
+
+##############################################################################
+
+# GET https://api.coinbase.com/api/v3/brokerage/portfolios
+
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getportfolios
+
+
+
+
+##############################################################################
+
+# POST https://api.coinbase.com/api/v3/brokerage/portfolios/move_funds
+
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_moveportfoliofunds
+
+
+##############################################################################
+##############################################################################
     i=0
     j=0
     ;;
@@ -2199,21 +2238,27 @@ read -p "Enter your choice [0, 1, 2, 3] :" x
     i=0
     ;;
 #####################################################################
-    1) # Create Keys
+    1) # Enter Keys
 
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold  -w "$columns" -bs  DOCS/create_keys.txt
+    fold  -w "$columns" -bs  DOCS/enter_keys.txt
     echo
-    read -p "Press ENTER to continue " n
-
-    $editor wCB-KEY1.txt
-
-
-    $editor wCB-KEY2.txt
 
     read -p "Press ENTER to continue " n
+    echo
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO ENTER YOUR KEYS? y/n : " yn
+
+    case $yn in
+        [Yy]* )
+        $editor wCB-KEY1.txt
+        $editor wCB-KEY2.txt
+        continue;;
+        [Nn]* )
+        break;;
+    esac
 
 #####################################################################
     i=0
@@ -2243,7 +2288,7 @@ case $yn in
         continue;;
         [Nn]* )
         break;;
-    esac
+esac
 
     i=0
     ;;
