@@ -1,0 +1,5 @@
+SHOW DEPOSIT
+
+Shows information about a specific deposit UUID.
+
+

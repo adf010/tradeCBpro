@@ -6,9 +6,5 @@ Enter the Retail Portfolio UUID and the currency for that portfolio to see break
 
 Hint: If you do not have your Retail Portfolio ID (RPID) handy just hit ENTER on both prompts and it will return the RPID that matches your API keys.
 
-
-
-
-
-
+Press ENTER to continue:  
 

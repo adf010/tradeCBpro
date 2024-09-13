@@ -11,6 +11,6 @@ A.) Are you using Legacy API keys? Do your keys have the permissions required fo
 
 3.) Why do my historical (ordeers, fills, etc.) only return a partial list?
 
-A.) It apperars that only information from 2023 and forward is available on the v3 API. I do not know why but will be looking into it. )It is possible that I need to get the start and end dates option added in.)
+A.) It apperars that only information from 2023 and forward is available on the v3 API. I do not know why but will be looking into it). It is possible that I need to get the start and end dates option added in(??).
 
 4.)

@@ -1,5 +1,5 @@
 #!/bin/bash
-CURRVER=0.9.-beta.2
+CURRVER=0.9-beta.2
 cd "${0%/*}"
 #
 #
@@ -54,7 +54,7 @@ ENDPOINT=$ENDPOINT3
 # Save and Save As are both accomplished with the Write Out command, Ctrl+O.
 # When prompted, press enter to accept the existing file name. To save as another
 # file name, type in the new name and press Enter, or use the Ctrl+T key combination
-# to use nano's built-in file browser.
+# to use nano's built-in file browser. To close the output window you can <CTRL -x>.
 #####################################################################################
 #####################################################################################
 # TODO:
@@ -63,7 +63,6 @@ ENDPOINT=$ENDPOINT3
 # Finish DOCS.
 # Reduce code.
 # Complete converting script to dynamic.
-# Add use of CDP keys.
 ##############################################################################
 ##############################################################################
 # F O L D #
@@ -122,7 +121,7 @@ echo "===================================="
   echo "[5]  PAYMENT METHODS"
   echo "[6]  DEPOSIT/WITHDRAW"
   echo "[7]  PORTFOLIO"
-  echo "[8]  ENTER/DELETE KEYS"
+  echo "[8]  ENTER/REMOVE KEYS"
   echo "[9]  Not Used"
   echo "[10] Miscellaneous"
   echo "===================================="
@@ -201,7 +200,7 @@ BODY="${limit}${eq1}${limit0}${amps}${cursor0}${eq1}${page0}${amps}${retail_port
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -253,7 +252,7 @@ BODY="$account_id"
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L "${BENDPOINT}${requestpath}${BODY}" \
  -X ${method}  \
  -H 'Content-Type: application/json'  \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -379,7 +378,7 @@ fi
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L -s  "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -929,7 +928,7 @@ TIMESTAMP=$(date +%s)
 #   NOT FINISHED    ##
 ###########################################################################################
 #####  EDIT ORDER
-#################################################################################################
+###########################################################################################
 # POST https://api.coinbase.com/api/v3/brokerage/orders/edit
 # curl -L -X POST 'https://api.coinbase.com/api/v3/brokerage/orders/edit' \
 # --data-raw '{"order_id":"1","price":"1","size":"1"}'
@@ -1125,7 +1124,7 @@ BODY="product_id=${product_id}&order_side=${side0^^}&order_status=${order_status
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s  "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1206,7 +1205,7 @@ read -p "Press ENTER to continue : " n
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+(curl -L "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1310,7 +1309,7 @@ base_size=
  SIG=$(echo -n "${TIMESTAMP}${method}/api/v3/brokerage/orders/preview" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
 
-(curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/orders/preview' \
+(curl -L -X "GET" "https://api.coinbase.com/api/v3/brokerage/orders/preview" \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -1517,7 +1516,7 @@ echo
 
 # TODO ADD OTHER OPTIONS
 
-( curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD/candles' \
+( curl -L -X "GET" "https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD/candles" \
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
  $editor CB-output.json
 
@@ -1652,7 +1651,7 @@ payment_method=""
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-( curl -L -s "${BENDPOINT}${requestpath}" \
+( curl -L "${BENDPOINT}${requestpath}" \
 -X ${method} \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-SIGN: $SIG" \
@@ -1689,7 +1688,7 @@ requestpath="/api/v3/brokerage/payment_methods/${payment_method}"
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}" \
+(curl -L "${BENDPOINT}${requestpath}" \
 -X ${method} \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-SIGN: $SIG" \
@@ -1818,7 +1817,7 @@ echo
     i=0
     ;;
     2)
-# COMMIT DEPOSIT   TODO: NOT DONE
+# COMMIT DEPOSIT   TODO: v3 version
 #################################################################################
 # POST https://api.coinbase.com/v2/accounts/:account_id/deposits/:deposit_id/commit
 #
@@ -1831,37 +1830,52 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/commit_deposit.txt
 echo
 
-read -p "Not Finished. Press ENTER to exit. " n
-# Section below is from list deposits.
-#####################################################################
+amount="amount"
+ amount1=""
+ currency="currency"
+ currency1=""
+ payment_method="payment_method"
+ payment_method1=""
+ deposits="deposits"
+ account_id1=""
+ commit="commit"
+ commit1=""
 
- #deposits_id=""
- #method="GET"
+ read -p "Enter Amount to Deposit (ex. 10.00): " amount1
+ read -p "Enter Currency Type (USD GBP etc.): " currency1
+ currency1=${currency1^^}
+ read -p "Enter Payment Method UUID: " payment_method1
+ read -p "Enter Receive Account UUID: " account_id1
+ read -p "Do you wish to Commit (true or false)" commit1
 
-#read -p "Enter Deposit Account UUID: " deposits_id
-#requestpath="/v2/accounts/${deposits_id}/deposits"
+ method="POST"
+ requestpath="/v2/accounts/${account_id1}/deposits"
 
-#TIMESTAMP=$(date +%s)
-# SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+ BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
+ echo "${requestpath}"
+ echo "${BODY}"
+ read -p "Press ENTER to continue : " n
 
-#(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
-#  -X ${method} \
-#  -H 'Content-Type: application/json' \
-#  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
-#  --header "CB-ACCESS-SIGN: $SIG" \
-#  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
-#  --header "CB-VERSION: $CBVERSION" \
-#       | jq . > CB-output.json )
-#  $editor CB-output.json
-#####################################################################
+ TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
+  urleq="${BENDPOINT}${requestpath}"
 
+  ( curl -L "$urleq" -v  \
+  -X ${method} \
+  -H 'Content-Type: application/json' \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION" \
+  --data-raw "${BODY}" | jq . > CB-output.json )
+  $editor CB-output.json
 
 #####################################################################
     i=0
     ;;
     3)
-    # LIST DEPOSITS
+    # LIST DEPOSITS    TODO: v3 version
 #####################################################################
 # GET https://api.coinbase.com/v2/accounts/:account_id/deposits
 #
@@ -1874,11 +1888,10 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/list_deposits.txt
 echo
 
-# curl https://api.coinbase.com/v2/accounts/2bbf394c-193b-5b2a-9155-3b4732659ede/deposits \
-
 deposits_id=""
  method="GET"
 
+echo "Hint: Portfolio Breakdown to get your Deposit account UUID."
 read -p "Enter Deposit Account UUID: " deposits_id
 requestpath="/v2/accounts/${deposits_id}/deposits"
 
@@ -1891,15 +1904,14 @@ TIMESTAMP=$(date +%s)
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
-  --header "CB-VERSION: $CBVERSION" \
-       | jq . > CB-output.json )
+  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
 
 #####################################################################
     i=0
     ;;
     4)
-    # SHOW DEPOSIT
+    # SHOW DEPOSIT     TODO: v3 version
 ##################################################################################
 # GET https://api.coinbase.com/v2/accounts/:account_id/deposits/:deposit_id
 #
@@ -1912,16 +1924,31 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/show_deposit.txt
 echo
 
-# example
-# curl https://api.coinbase.com/v2/accounts/2bbf394c-193b-5b2a-9155-3b4732659ede/deposits/67e0eaec-07d7-54c4-a72c-2e92826897df /
+deposits_id=""
+ method="GET"
 
+echo "Hint: Use Portfolio Breakdown to get your Deposit account UUID."
+read -p "Enter Deposit Account UUID: " deposits_id
+read -p "Enter single Deposit ID: " deposit_id
+requestpath="/v2/accounts/${deposits_id}/deposits/${deposit_id}"
 
+TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits/${deposit_id}" \
+  -X ${method} \
+  -H 'Content-Type: application/json' \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
+  $editor CB-output.json
 
 #####################################################################
    i=0
    ;;
    5)
-   # WITHDRAW FUNDS
+   # WITHDRAW FUNDS   TODO:  v3 version
 #####################################################################
 # POST https://api.coinbase.com/v2/accounts/:account_id/withdrawals
 #
@@ -1947,10 +1974,10 @@ echo
  commit1=""
 
  read -p "Enter account to draw from: " account_id1
- read -p "Enter Amount to Deposit (ex. 10.00): " amount1
+ read -p "Enter Amount to Withdraw (ex. 10.00): " amount1
  read -p "Enter Currency Type (USD GBP etc.): " currency1
  currency1=${currency1^^}
- read -p "Enter Payment Method UUID: " payment_method1
+ read -p "Enter Payment Method UUID of Receive ACCT.: " payment_method1
  read -p "Do you wish to Commit (true or false)" commit1
 
 requestpath="/v2/accounts/${account_id1}/withdrawals"
@@ -1974,20 +2001,11 @@ TIMESTAMP=$(date +%s)
   --data-raw "${BODY}" | jq . > CB-output.json )
   $editor CB-output.json
 
-# curl https://api.coinbase.com/v2/accounts/82de7fcd-db72-5085-8ceb-bee19303080b/withdrawals /
-#  -X POST \
-#  -H 'Content-Type: application/json' \
-#  -d '{
-#    "amount": "10",
-#    "currency": "USD",
-#    "payment_method": "83562370-3e5c-51db-87da-752af5ab9559"
-#  }'
-
 #####################################################################
    i=0
    ;;
    6)
-   # COMMIT WITHDRAWAL
+   # COMMIT WITHDRAWAL  TODO: FINISH
 ##################################################################################
 # POST https://api.coinbase.com/v2/accounts/:account_id/withdrawals/:withdrawal_id/commit
 #
@@ -2000,18 +2018,49 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/commit_withdrawal.txt
 echo
 
-# example
-# curl https://api.coinbase.com/v2/accounts/82de7fcd-db72-5085-8ceb-bee19303080b/withdrawals/a333743d-184a-5b5b-abe8-11612fc44ab5/commit /
+amount="amount"
+ amount1=""
+ currency="currency"
+ currency1=""
+ payment_method="payment_method"
+ payment_method1=""
+ account_id1=""
+ method="POST"
+ commit="commit"
+ commit1=""
+
+ read -p "Enter account to draw from: " account_id1
+ read -p "Enter Amount to Withdraw (ex. 10.00): " amount1
+ read -p "Enter Currency Type (USD GBP etc.): " currency1
+ currency1=${currency1^^}
+ read -p "Enter Payment Method UUID of Receive Acct.: " payment_method1
+ read -p "Do you wish to Commit (true or false)" commit1
+
+requestpath="/v2/accounts/${account_id1}/withdrawals"
+
+ BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
+ echo "${requestpath}"
+ echo "${BODY}"
+ read -p "Press ENTER to continue : " n
 
 
+TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-
-
+(curl -L "${BENDPOINT}${requestpath}" \
+  -X ${method} \
+  -H 'Content-Type: application/json' \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION" \
+  --data-raw "${BODY}" | jq . > CB-output.json )
+  $editor CB-output.json
 #####################################################################
   i=0
    ;;
    7)
-   # LIST WITHDRAWALS
+   # LIST WITHDRAWALS  TODO: v3 version
 #####################################################################
 # GET https://api.coinbase.com/v2/accounts/:account_id/withdrawals
 #
@@ -2024,30 +2073,30 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/list_withdrawals.txt
 echo
 
- deposits_id=""
+ withdrawals_id=""
  method="GET"
 
-read -p "Enter Withdrawal Account UUID: " deposits_id
-requestpath="/v2/accounts/${deposits_id}/withdrawals"
+echo "Hint: Use Get or List Payment Method(s) to get your withdrawal account UUID."
+read -p "Enter Withdrawal Account UUID: " withdrawals_id
+requestpath="/v2/accounts/${withdrawals_id}/withdrawals"
 
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/withdrawals" \
+(curl -L "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
-  --header "CB-VERSION: $CBVERSION" \
-       | jq . > CB-output.json )
+  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
 
 #####################################################################
   i=0
   ;;
   8)
-  # SHOW WITHDRAWAL
+  # SHOW WITHDRAWAL  TODO: v3 version
 ##################################################################################
 ##################################################################################
 # GET https://api.coinbase.com/v2/accounts/:account_id/withdrawals/:withdrawal_id
@@ -2061,12 +2110,31 @@ lines=$(tput lines)
 fold  -w "$columns" -bs DOCS/show_withdrawal.txt
 echo
 
+ withdrawals_id=""
+ withdrawal_id=""
+ method="GET"
 
-# curl https://api.coinbase.com/v2/accounts/123/withdrawals/321 /
-#
+echo "Hint: Use Get or List Payment Method(s) to get your withdrawal account UUID."
+read -p "Enter Withdrawal Account UUID: " withdrawals_id
+read -p "Enter single Withdrawal ID: " withdrawal_id
+requestpath="/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}"
 
+TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
+(curl -L "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}" \
+  -X ${method} \
+  -H 'Content-Type: application/json' \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
+  $editor CB-output.json
 
+####################################################################
+  i=0
+  ;;
+  8)
 #####################################################################
     i=0
     j=0
@@ -2129,7 +2197,7 @@ read -p "Enter your choice [0, 1, 2] :" x
     fold  -w "$columns" -bs  DOCS/portfolio_breakdown.txt
     echo
 
-    read -p "Press ENTER to continue " n
+    read -p " " n
 
     method="GET"
     portfolio_uuid=""
@@ -2621,10 +2689,12 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     i=0
     ;;
     2)    echo " Calculate Amount of ONION For Amount of BTC "
+    echo "This can be used to find the amount of any crypto."
+    echo "Just enter the current price of your favorite COIN/TOKEN."
     BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
     echo "BTC = $"$BTCBTC
     read -p " Enter The Price of ONION : " u
-    read -p " Enter the Amount to SPEND : " USDONION
+    read -p " Enter the Amount of fiat to SPEND : " USDONION
     AmountOfONION=$(echo "scale=8;$USDONION/$u" | bc)
     echo " Your Amount of ONION = : " $AmountOfONION
     read -p "Hit ENTER to continue" g
@@ -2648,7 +2718,7 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     echo "BTC = $"$BTCBTC
     read -p " Enter Amount of USD : " w
     AmountOfBTC=$(echo "scale=8;$w/$BTCBTC" | bc )
-    echo " Your Amount of BTC = " $AmountOfBTC
+    echo " Your Amount of BTC (or any fiat) = " $AmountOfBTC
     read -p "Hit ENTER to continue" g
     echo
     echo
