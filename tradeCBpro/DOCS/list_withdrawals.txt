@@ -2,4 +2,6 @@ LIST WITHDRAWALS
 
 Lists withdrawals for an account.
 
+Hint: Use Portfolio Breakdown to get your withdrawal account UUID.
+
 

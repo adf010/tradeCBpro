@@ -176,7 +176,7 @@ read -p "Type a number [0, 1, 2] :" x
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/list_accounts.txt
+fold -w "$columns" -bs  DOCS/list_accounts.txt
 echo
 method="GET"
 requestpath="/api/v3/brokerage/accounts"
@@ -240,7 +240,7 @@ done
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/get_account.txt
+fold -w "$columns" -bs DOCS/get_account.txt
 echo
 echo
 read -p "Enter Account UUID : " account_id
@@ -323,7 +323,7 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6] :" x
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/best_bid_ask.txt
+fold -w "$columns" -bs  DOCS/best_bid_ask.txt
 echo
 
 ## TODO
@@ -402,7 +402,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
  clear
  columns=$(tput cols)
  lines=$(tput lines)
- fold  -w "$columns" -bs  DOCS/product_book.txt
+ fold -w "$columns" -bs  DOCS/product_book.txt
  echo
 
  product_id="product_id"
@@ -456,7 +456,7 @@ fi
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/list_products.txt
+fold -w "$columns" -bs  DOCS/list_products.txt
 echo
 
     method="GET"
@@ -507,7 +507,7 @@ echo
   clear
   columns=$(tput cols)
   lines=$(tput lines)
-  fold  -w "$columns" -bs  DOCS/get_product.txt
+  fold -w "$columns" -bs  DOCS/get_product.txt
 
     method="GET"
     requestpath="/api/v3/brokerage/products/${product_id1}"
@@ -552,7 +552,7 @@ echo
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/product_candles.txt
+fold -w "$columns" -bs DOCS/product_candles.txt
 echo
 
 echo "ONE_MINUTE"
@@ -628,7 +628,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/market_trades.txt
+fold -w "$columns" -bs  DOCS/market_trades.txt
 echo
 
 product_id="product_id"
@@ -694,7 +694,6 @@ done
     printf "\n"
  ######################################################
     elif [[ "$ENDPOINT" == "$ENDPOINT2" ]]; then
-    echo -e '\E[31;40m'"\033[1m"
     echo -e '\E[32;40m'"\033[1m"
     printf "\n"
 ##################################################################
@@ -741,7 +740,7 @@ read -p "Enter a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" x
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/create_order.txt
+fold -w "$columns" -bs  DOCS/create_order.txt
 echo
  limit_price0="limit_price"
  limit_price1=""
@@ -876,7 +875,7 @@ urleq="${BENDPOINT}${requestpath}"
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/cancel_orders.txt
+fold -w "$columns" -bs  DOCS/cancel_orders.txt
 
  method="POST"
  order_ids0="order_ids"
@@ -939,7 +938,7 @@ TIMESTAMP=$(date +%s)
  clear
  columns=$(tput cols)
  lines=$(tput lines)
- fold  -w "$columns" -bs  DOCS/edit_order.txt
+ fold -w "$columns" -bs  DOCS/edit_order.txt
  echo
 
  size0="size"
@@ -986,7 +985,7 @@ TIMESTAMP=$(date +%s)
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/preview_order_request.txt
+fold -w "$columns" -bs  DOCS/preview_order_request.txt
 
 method="POST"
  requestpath="/api/v3/brokerage/orders/edit_preview"
@@ -1022,7 +1021,7 @@ $editor CB-output.json
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/list_orders.txt
+fold -w "$columns" -bs  DOCS/list_orders.txt
 echo
 
 # TODO a bunch
@@ -1148,7 +1147,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/list_fills.txt
+fold -w "$columns" -bs DOCS/list_fills.txt
 echo
 
 # Get a list of fills filtered by optional query parameters (product_id, order_id, etc).
@@ -1243,7 +1242,7 @@ done
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/get_order.txt
+fold -w "$columns" -bs DOCS/get_order.txt
 echo
 # user_native_currency (default= USD)
 method="GET"
@@ -1282,7 +1281,7 @@ $editor CB-output.json
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/preview_order.txt
+fold -w "$columns" -bs DOCS/preview_order.txt
 echo
 
 # curl -L 'https://api.coinbase.com/api/v3/brokerage/orders/preview' \
@@ -1675,7 +1674,7 @@ $editor CB-output.json
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/get_payment_method.txt
+fold -w "$columns" -bs  DOCS/get_payment_method.txt
 echo
 
 method="GET"
@@ -1769,7 +1768,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6, 7, 8] :" x
  clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/deposit.txt
+fold -w "$columns" -bs DOCS/deposit.txt
 echo
 
  amount="amount"
@@ -1827,7 +1826,7 @@ echo
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/commit_deposit.txt
+fold -w "$columns" -bs DOCS/commit_deposit.txt
 echo
 
 amount="amount"
@@ -1885,7 +1884,7 @@ amount="amount"
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/list_deposits.txt
+fold -w "$columns" -bs DOCS/list_deposits.txt
 echo
 
 deposits_id=""
@@ -1921,7 +1920,7 @@ TIMESTAMP=$(date +%s)
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/show_deposit.txt
+fold -w "$columns" -bs DOCS/show_deposit.txt
 echo
 
 deposits_id=""
@@ -1958,7 +1957,7 @@ TIMESTAMP=$(date +%s)
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/create_withdrawal.txt
+fold -w "$columns" -bs DOCS/create_withdrawal.txt
 echo
 
 
@@ -2070,13 +2069,12 @@ TIMESTAMP=$(date +%s)
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/list_withdrawals.txt
+fold -w "$columns" -bs DOCS/list_withdrawals.txt
 echo
 
  withdrawals_id=""
  method="GET"
 
-echo "Hint: Use Get or List Payment Method(s) to get your withdrawal account UUID."
 read -p "Enter Withdrawal Account UUID: " withdrawals_id
 requestpath="/v2/accounts/${withdrawals_id}/withdrawals"
 
@@ -2107,14 +2105,13 @@ TIMESTAMP=$(date +%s)
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs DOCS/show_withdrawal.txt
+fold -w "$columns" -bs DOCS/show_withdrawal.txt
 echo
 
  withdrawals_id=""
  withdrawal_id=""
  method="GET"
 
-echo "Hint: Use Get or List Payment Method(s) to get your withdrawal account UUID."
 read -p "Enter Withdrawal Account UUID: " withdrawals_id
 read -p "Enter single Withdrawal ID: " withdrawal_id
 requestpath="/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}"
@@ -2194,7 +2191,7 @@ read -p "Enter your choice [0, 1, 2] :" x
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold  -w "$columns" -bs  DOCS/portfolio_breakdown.txt
+    fold -w "$columns" -bs  DOCS/portfolio_breakdown.txt
     echo
 
     read -p " " n
@@ -2316,7 +2313,7 @@ read -p "Enter your choice [0, 1, 2, 3] :" x
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold  -w "$columns" -bs  DOCS/enter_keys.txt
+    fold -w "$columns" -bs  DOCS/enter_keys.txt
     echo
 
     read -p "Press ENTER to continue " n
@@ -2328,6 +2325,8 @@ read -p "Enter your choice [0, 1, 2, 3] :" x
         [Yy]* )
         $editor wCB-KEY1.txt
         $editor wCB-KEY2.txt
+        COINBASE_KEY=`cat wCB-KEY1.txt`
+        COINBASE_SECRET=`cat wCB-KEY2.txt`
         continue;;
         [Nn]* )
         break;;
@@ -2341,13 +2340,13 @@ read -p "Enter your choice [0, 1, 2, 3] :" x
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold  -w "$columns" -bs  DOCS/remove_keys.txt
+    fold -w "$columns" -bs  DOCS/remove_keys.txt
     echo
     #WARN="WARNING!!!"
     read -p "Press ENTER to continue " n
     echo
     echo -e '\E[31;40m'"\033[1m"
-    read -p "ARE YOU SURE YOU WANT TO DELETE YOUR KEYS? y/n : " yn
+    read -p "ARE YOU SURE YOU WANT TO REMOVE YOUR KEYS? y/n : " yn
 
 case $yn in
         [Yy]* )
@@ -2370,7 +2369,7 @@ esac
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold  -w "$columns" -bs  DOCS/remove_keys_info.txt
+    fold -w "$columns" -bs  DOCS/remove_keys_info.txt
     echo
 
 echo "This will REMOVE KEYS as well as the CB-output.json file."
@@ -2400,10 +2399,10 @@ touch wCB-KEY2.txt
     esac
 
 #####################################################################
-    j=0
+    i=0
     ;;
     *)
-    i=1;;
+    #i=1;;
 
   esac
 done
@@ -2531,7 +2530,7 @@ done
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold  -w "$columns" -bs DOCS/live_stats.txt
+    fold -w "$columns" -bs DOCS/live_stats.txt
     echo
 
 read -p "Do you want to continue? (y or n) : " n
@@ -2567,7 +2566,7 @@ done
        clear
        columns=$(tput cols)
        lines=$(tput lines)
-       fold  -w "$columns" -bs  DOCS/notes.txt
+       fold -w "$columns" -bs  DOCS/notes.txt
        echo
        echo -e '\E[31;40m'"\033[1m"
        echo "IT IS STRONGLY ADVISED TO NOT USE THIS OPTION TO STORE SENSITIVE INFORMATION."
@@ -2615,7 +2614,7 @@ done
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/faq.txt
+fold -w "$columns" -bs  DOCS/faq.txt
 echo
 
 read -n 1 -s -r -p "Press any key to continue"
@@ -2632,7 +2631,7 @@ read -n 1 -s -r -p "Press any key to continue"
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold  -w "$columns" -bs  DOCS/remove_info.txt
+fold -w "$columns" -bs  DOCS/remove_info.txt
 echo
 
 read -p "This section does nothing at this time. Press ENTER to exit : " n
