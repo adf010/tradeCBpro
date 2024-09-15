@@ -1,6 +1,14 @@
-# tradeCBpr![menu](https://github.com/user-attachments/assets/4ec3af59-ee3b-43a5-b5af-449b1d9549b7)
+# tradeCBpro
 o
 Buy, Sell or Trade on Coinbase© 
+
+
+![menu](https://github.com/user-attachments/assets/4ec3af59-ee3b-43a5-b5af-449b1d9549b7)
+
+
+
+
+
 
 ![alt text](https://github.com/adf010/tradeCBpro/DOCS/menu.png?raw=true "Menu")
 
