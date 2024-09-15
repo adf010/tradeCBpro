@@ -1,6 +1,6 @@
 # tradeCBpro
 
-Buy, Sell or Trade on Coinbase© 
+## Buy, Sell or Trade on Coinbase© 
 
 ![menu2](https://github.com/user-attachments/assets/1390179f-e53f-49a0-b9be-7e6bd6c1c29a)
 
@@ -18,7 +18,7 @@ The second method is to press Enter at the 2 prompts mentioned above and use the
 The third method is to put the key/secret into the files named wCB-KEY1.txt/wCB-KEY2.txt respectively. Be aware that you should only use this method if you are the only one with access to the computer.
 
 ERROR CHECKING
-There is little to no error checking other than calls such as BUY/SELL where you might lose money or crypto.  So when prompted to check information you entered be sure to examine your input CLOSELY. If ever you are not sure of what to press you can always <<CTRL-c>> to abort the script.  On BUY/SELL, once you say "y" or "yes" to send transaction it is too late.
+There is little to no error checking other than calls such as BUY/SELL where you might lose money or crypto.  So when prompted to check information you entered be sure to examine your input CLOSELY. If ever you are not sure of what to press you can always \<CTRL-c> to abort the script.  On BUY/SELL, once you say "y" or "yes" to send transaction it is too late.
 
 DEFAULTS
 If you see text at the end of a prompt such as "(ex. BTC-USD)", that is only an example of the type and syntax of what you need to enter. If you see text such as "Default= [BTC-USD]", you can press enter to accept the default or enter something else.
