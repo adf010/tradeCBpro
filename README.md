@@ -1,5 +1,5 @@
 # tradeCBpro
-o
+
 Buy, Sell or Trade on Coinbase© 
 
 
