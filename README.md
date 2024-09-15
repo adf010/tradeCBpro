@@ -2,10 +2,7 @@
 
 Buy, Sell or Trade on Coinbase© 
 
-
-![menu](https://github.com/user-attachments/assets/4ec3af59-ee3b-43a5-b5af-449b1d9549b7)
-
-
+![menu2](https://github.com/user-attachments/assets/1390179f-e53f-49a0-b9be-7e6bd6c1c29a)
 
 The script is well documented with Coinbase© links to each API call included in the script.
 
