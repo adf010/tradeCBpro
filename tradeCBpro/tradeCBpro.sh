@@ -214,7 +214,7 @@ echo -e '\E[31;40m'"\033[1m"
 case $yn in
         [Yy]* )
         echo -e '\E[32;40m'"\033[1m"
-        rm "$PWD"/CB-output.json
+        rm -f "$PWD"/CB-output.json
         touch "$PWD"/CB-output.json
         break;;
         [Nn]* )
@@ -537,7 +537,6 @@ echo
     i=0
     ;;
     5)
-
 #  NOT FINISHED #####################################################################################
     #    TODO: ADD GRANULARITY INFO
 #####################################################################################
@@ -1118,8 +1117,8 @@ qmark="?"
 method="GET"
 requestpath="/api/v3/brokerage/orders/historical/batch"
 BODY="product_id=${product_id}&order_side=${side0^^}&order_status=${order_status0}"
-#echo $BODY
-#read -p "" n
+echo $BODY
+read -p "" n
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
@@ -2168,9 +2167,13 @@ echo "PORTFOLIO"
 echo -e '\E[33;40m'"\033[1m"
 echo "Main Menu            = 0"
 echo "Portfolio Breakdown  = 1"
-echo "Nothing yet          = 2"
+echo "List Portfolios      = 2"
+echo "Create Portfolio     = 3"
+echo "Delete Portfolio     = 4"
+echo "Edit Portfolio       = 5"
+echo "Move Portfolio Funds = 6"
 echo
-read -p "Enter your choice [0, 1, 2] :" x
+read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
 
    case $x in
 
@@ -2184,7 +2187,6 @@ read -p "Enter your choice [0, 1, 2] :" x
     1) # Get Portfolio Breakdown
     ##############################################################################
     # GET https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
-    #
     # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getportfoliobreakdown
     ##############################################################################
     # Get the breakdown of a portfolio.
@@ -2222,45 +2224,242 @@ read -p "Enter your choice [0, 1, 2] :" x
     i=0
     ;;
     2)
+# LIST PORTFOLIOS
 ##############################################################################
-echo "nothing yet"
-# https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_deleteportfolio
-
-
-
-
-##############################################################################
-
-# PUT https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
-
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_editportfolio
-
-
-
-##############################################################################
-
-# POST https://api.coinbase.com/api/v3/brokerage/portfolios
-
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_createportfolio
-
-##############################################################################
-
 # GET https://api.coinbase.com/api/v3/brokerage/portfolios
-
+# https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getportfolios
-
-
-
-
 ##############################################################################
+# Get all portfolios of a user.
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/list_portfolios.txt
+    echo
 
+  #read -p " " n
+
+    method="GET"
+    portfolio_type0="portfolio_type"
+    portfolio_type1=""
+
+ #   'https://api.coinbase.com/api/v3/brokerage/portfolios?portfolio_type=DEFAULT'
+
+     read -p "Enter Portfolio Type? Default = [DEFAULT]:" portfolio_type1 ; portfolio_type1=${portfolio_type1:-DEFAULT}
+     portfolio_type1=${portfolio_type1^^}
+
+    requestpath="/api/v3/brokerage/portfolios"
+    BODY="${qmark}${portfolio_type1}"
+
+   TIMESTAMP=$(date +%s)
+   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+  (curl -L "${BENDPOINT}${requestpath}${BODY}" -v  \
+  -X ${method} \
+  -H 'Content-Type: application/json' \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
+  $editor CB-output.json
+
+    i=0
+    ;;
+    3)
+# CREATE PORTFOLIO
+##############################################################################
+# POST https://api.coinbase.com/api/v3/brokerage/portfolios
+# curl -L 'https://api.coinbase.com/api/v3/brokerage/portfolios' -d '{"name":"test"}'
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_createportfolio
+##############################################################################
+# Create a portfolio.
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/create_portfolio.txt
+    echo
+
+  #read -p " " n
+
+    method="POST"
+    name0="name"
+    portfolio_name1=""
+
+      read -p "Enter Portfolio Name? :" portfolio_name1
+
+    requestpath="/api/v3/brokerage/portfolios"
+    BODY="{\"${name0}\":\"${portfolio_name1}\"}"
+    #BODY="'{\"${name0}\":\"${portfolio_name1}\"}'"
+    #echo ${BODY}
+    #read -p " " n
+
+   TIMESTAMP=$(date +%s)
+   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+ #(curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}" -v  \
+  (curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -v  \
+  -X ${method} \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION"\
+  -d "${BODY}" \
+  | jq . > CB-output.json )
+  $editor CB-output.json
+#read -p " " n
+    i=0
+    ;;
+    4)
+# DELETE PORTFOLIO
+##############################################################################
+# DELETE https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
+# curl -L -X DELETE 'https://api.coinbase.com/api/v3/brokerage/portfolios/12345'
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_deleteportfolio
+##############################################################################
+# Delete portfolio.
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/delete_portfolio.txt
+    echo
+
+    method="DELETE"
+    portfolio_uuid1=""
+
+    read -p " Enter UUID of Portfolio to be DELETED :  " portfolio_uuid1
+
+    requestpath="/api/v3/brokerage/portfolios/${portfolio_uuid1}"
+    BODY=""
+
+     echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO DELETE PORTFOLIO ${portfolio_uuid1} ? y/n : " yn
+
+     case $yn in
+       [Yy]* )
+
+   TIMESTAMP=$(date +%s)
+   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+  (curl -L "${BENDPOINT}${requestpath}${BODY}" -v  \
+  -X ${method} \
+  -H 'Content-Type: application/json' \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
+  $editor CB-output.json
+  #read -p " " n
+
+       continue;;
+       [Nn]* )
+       break;;
+    esac
+
+#############################################################################
+    i=0
+    ;;
+    5)
+# EDIT PORTFOLIO
+##############################################################################
+# PUT https://api.coinbase.com/api/v3/brokerage/portfolios/{portfolio_uuid}
+# curl -L -X PUT 'https://api.coinbase.com/api/v3/brokerage/portfolios/12345' -d '{"name":"test3"}'
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_editportfolio
+##############################################################################
+# Edit a portfolio.
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/edit_portfolio.txt
+    echo
+
+    method="PUT"
+    portfolio_uuid1=""
+    name0="name"
+    portfolio_name1=""
+
+      read -p "Enter Portfolio UUID: " portfolio_uuid1
+      read -p "Enter Portfolio Name? :" portfolio_name1
+
+    requestpath="/api/v3/brokerage/portfolios/${portfolio_uuid1}"
+
+    BODY="{\"${name0}\":\"${portfolio_name1}\"}"
+    #BODY="'{\"${name0}\":\"${portfolio_name1}\"}'"
+    #echo ${BODY}
+    #read -p " " n
+
+   TIMESTAMP=$(date +%s)
+   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+ #(curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}" -v  \
+  (curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -v  \
+  -X ${method} \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION"\
+  -d "${BODY}" \
+  | jq . > CB-output.json )
+  $editor CB-output.json
+#read -p " " n
+
+    i=0
+    ;;
+    6)
+# MOVE PORTFOLIO FUNDS
+##############################################################################
 # POST https://api.coinbase.com/api/v3/brokerage/portfolios/move_funds
-
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_moveportfoliofunds
-
-
 ##############################################################################
+# Move funds between portfolios.
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/move_portfolio_funds.txt
+    echo
+
+  method="POST"
+  requestpath="/api/v3/brokerage/portfolios/move_funds"
+
+  read -p "Enter amount of funds to be transferred: " amount1
+  read -p "Enter currency type (ex. USD): " currency1
+  currency1=${currency1^^}
+  read -p "Enter source portfolio UUID : " uuid1
+  read -p "Enter target portfolio UUID : " uuid2
+
+
+  BODY="{\"funds\":{\"value\":\""${amount1}"\",\"currency\":\""${currency1}"\"},\"source_portfolio_uuid\":\""${uuid1}"\",\"target_portfolio_uuid\":\""${uuid2}"\"}"
+
+  #echo ${BODY}
+  #read -p " " n
+
+#-d '{"funds":{"value":"1.00","currency":"usd"},"source_portfolio_uuid":"12345","target_portfolio_uuid":"54321"}'
+
+ TIMESTAMP=$(date +%s)
+   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+  (curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -v  \
+  -X ${method} \
+  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+  --header "CB-ACCESS-SIGN: $SIG" \
+  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+  --header "CB-VERSION: $CBVERSION"\
+  -d "${BODY}" \
+  | jq . > CB-output.json )
+  $editor CB-output.json
+#read -p " " n
+
+
+
+    i=0
+    ;;
+    7)
+##############################################################################
+
+
+
+    i=0
+    ;;
+    8)
 ##############################################################################
     i=0
     j=0

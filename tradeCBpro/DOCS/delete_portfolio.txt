@@ -1,0 +1,5 @@
+DELETE PORTFOLIO
+
+WARNING!! The Portfolio UUID you enter WILL BE DELETED. I have no idea if it will refuse to delete a portfolio with money/crypto in it. It is up to you to be sure it is empty and you put in the correct UUID. 
+
+I am only getting a couple curly brackets for response but it does delete an empty portfolio. Still, be careful when deleting. 

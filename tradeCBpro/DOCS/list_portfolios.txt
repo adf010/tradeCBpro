@@ -1,0 +1,9 @@
+LIST PORTFOLIOS
+
+Get all portfolios of a user.
+
+Choices are: UNDEFINED ; DEFAULT ; CONSUMER ; INTX
+
+The default is DEFAULT so you can just accept the default by pressing ENTER.
+
+
