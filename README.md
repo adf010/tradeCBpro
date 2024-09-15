@@ -1,6 +1,8 @@
 # tradeCBpro
 Buy, Sell or Trade on Coinbase© 
 
+![alt menu](https://github.com/adf010/tradeCBpro/DOCS/main/menu.png?raw=true)
+
 The script is well documented with Coinbase© links to each API call included in the script.
 
 API KEYS
