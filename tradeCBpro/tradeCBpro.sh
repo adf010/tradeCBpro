@@ -1,5 +1,5 @@
 #!/bin/bash
-CURRVER=0.9-beta.2
+CURRVER=0.9-beta.3
 cd "${0%/*}"
 #
 #
@@ -200,7 +200,7 @@ BODY="${limit}${eq1}${limit0}${amps}${cursor0}${eq1}${page0}${amps}${retail_port
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -252,7 +252,7 @@ BODY="$account_id"
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
  -X ${method}  \
  -H 'Content-Type: application/json'  \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -378,7 +378,7 @@ fi
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -429,7 +429,7 @@ fi
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -484,7 +484,7 @@ echo
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -525,7 +525,7 @@ echo
     TIMESTAMP=$(date +%s)
     SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  ( curl -L "${BENDPOINT}${requestpath}${BODY}"    \
+  ( curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
    -X "${method}"  \
    -H 'Content-Type: application/json' \
    --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -603,7 +603,7 @@ read -p "Press ENTER to continue : " n
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}${BODY}"  -v \
+(curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
  -X ${method}  \
  -H 'Content-Type: application/json'  \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -850,7 +850,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha25
 
 urleq="${BENDPOINT}${requestpath}"
 
-(curl -L "$urleq" -v  \
+(curl -L -s "$urleq"  \
  -X ${method}             \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -908,7 +908,7 @@ BODY="{\"${order_ids0}\":[${BODY1}]}"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-( curl -L "${BENDPOINT}${requestpath}" -v \
+( curl -L -s "${BENDPOINT}${requestpath}"  \
  -X ${method} \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -959,7 +959,7 @@ TIMESTAMP=$(date +%s)
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
  -X ${method}  \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -994,7 +994,7 @@ method="POST"
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}/api/v3/brokerage/orders/edit_preview" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L 'https://api.coinbase.com/api/v3/brokerage/orders/edit_preview' \
+(curl -L -s 'https://api.coinbase.com/api/v3/brokerage/orders/edit_preview' \
 -X ${method}  \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1122,7 +1122,7 @@ read -p "" n
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1203,7 +1203,7 @@ read -p "Press ENTER to continue : " n
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+(curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1254,7 +1254,7 @@ read -p "Enter Order ID : " order_id1
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
- (curl -L "${BENDPOINT}${requestpath}" \
+ (curl -L -s "${BENDPOINT}${requestpath}" \
  -X ${method} \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1307,7 +1307,7 @@ base_size=
  SIG=$(echo -n "${TIMESTAMP}${method}/api/v3/brokerage/orders/preview" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
 
-(curl -L -X "GET" "https://api.coinbase.com/api/v3/brokerage/orders/preview" \
+(curl -L -s -X "GET" "https://api.coinbase.com/api/v3/brokerage/orders/preview" \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -1385,7 +1385,7 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/server_time.txt
 echo
 
-( curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/time' \
+( curl -L -X "GET" 'https://api.coinbase.com/api/v3/brokerage/time' \
 -H 'Content-Type: application/json' \
 | jq -r . > CB-output.json )
  $editor CB-output.json
@@ -1649,7 +1649,7 @@ payment_method=""
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-( curl -L "${BENDPOINT}${requestpath}" \
+( curl -L -s "${BENDPOINT}${requestpath}" \
 -X ${method} \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-SIGN: $SIG" \
@@ -1686,7 +1686,7 @@ requestpath="/api/v3/brokerage/payment_methods/${payment_method}"
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}" \
+(curl -L -s "${BENDPOINT}${requestpath}" \
 -X ${method} \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-SIGN: $SIG" \
@@ -1794,14 +1794,19 @@ echo
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
- read -p "Press ENTER to continue : " n
+ read -p "Review the values you entered and Press ENTER to continue : " n
 
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO COMPLETE THIS DEPOSIT to ${account_id1} ? y/n : " yn
+
+    case $yn in
+        [Yy]* )
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
   urleq="${BENDPOINT}${requestpath}"
 
-  ( curl -L "$urleq" -v  \
+  ( curl -L -s "$urleq"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1810,6 +1815,10 @@ echo
   --header "CB-VERSION: $CBVERSION" \
   --data-raw "${BODY}" | jq . > CB-output.json )
   $editor CB-output.json
+      continue;;
+      [Nn]* )
+      break;;
+    esac
 
  ####################################################################
     i=0
@@ -1859,7 +1868,7 @@ amount="amount"
 
   urleq="${BENDPOINT}${requestpath}"
 
-  ( curl -L "$urleq" -v  \
+  ( curl -L -s "$urleq"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1896,7 +1905,7 @@ requestpath="/v2/accounts/${deposits_id}/deposits"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
+(curl -L -s "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1933,7 +1942,7 @@ requestpath="/v2/accounts/${deposits_id}/deposits/${deposit_id}"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits/${deposit_id}" \
+(curl -L -s "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits/${deposit_id}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1975,8 +1984,8 @@ echo
  read -p "Enter Amount to Withdraw (ex. 10.00): " amount1
  read -p "Enter Currency Type (USD GBP etc.): " currency1
  currency1=${currency1^^}
- read -p "Enter Payment Method UUID of Receive ACCT.: " payment_method1
- read -p "Do you wish to Commit (true or false)" commit1
+ read -p "Enter UUID of RECEIVE ACCOUNT: " payment_method1
+ read -p "Do you wish to Commit this transaction (true or false)" commit1
 
 requestpath="/v2/accounts/${account_id1}/withdrawals"
 
@@ -1985,11 +1994,14 @@ requestpath="/v2/accounts/${account_id1}/withdrawals"
  echo "${BODY}"
  read -p "Press ENTER to continue : " n
 
-
+ echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO COMPLETE THIS WITHDRAWAL to ${payment_method1} ? y/n : " yn
+    case $yn in
+        [Yy]* )
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}" \
+(curl -L -s "${BENDPOINT}${requestpath}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1998,12 +2010,16 @@ TIMESTAMP=$(date +%s)
   --header "CB-VERSION: $CBVERSION" \
   --data-raw "${BODY}" | jq . > CB-output.json )
   $editor CB-output.json
+    continue;;
+      [Nn]* )
+      break;;
+    esac
 
 #####################################################################
    i=0
    ;;
    6)
-   # COMMIT WITHDRAWAL  TODO: FINISH
+# COMMIT WITHDRAWAL  TODO: FINISH
 ##################################################################################
 # POST https://api.coinbase.com/v2/accounts/:account_id/withdrawals/:withdrawal_id/commit
 #
@@ -2041,11 +2057,10 @@ requestpath="/v2/accounts/${account_id1}/withdrawals"
  echo "${BODY}"
  read -p "Press ENTER to continue : " n
 
-
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "${BENDPOINT}${requestpath}" \
+(curl -L -s "${BENDPOINT}${requestpath}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2080,7 +2095,7 @@ requestpath="/v2/accounts/${withdrawals_id}/withdrawals"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals" \
+(curl -L -s "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2118,7 +2133,7 @@ requestpath="/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}" \
+(curl -L -s "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2212,7 +2227,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L "${BENDPOINT}${requestpath}${BODY}" -v  \
+  (curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2254,7 +2269,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L "${BENDPOINT}${requestpath}${BODY}" -v  \
+  (curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2297,7 +2312,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
  #(curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}" -v  \
-  (curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -v  \
+  (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
@@ -2340,7 +2355,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L "${BENDPOINT}${requestpath}${BODY}" -v  \
+  (curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2391,7 +2406,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
  #(curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}" -v  \
-  (curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -v  \
+  (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
@@ -2437,7 +2452,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
  TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -v  \
+  (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
@@ -2703,7 +2718,25 @@ echo -e '\E[32;40m'"\033[1m"
 do
 
 sleep 1s
-outputb=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+# outputb=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+#curl https://api.coinbase.com/v2/prices/${prod_id}/spot
+
+# https://api.exchange.coinbase.com/products/{product_id}/stats
+# output
+# {
+#  "open": "5414.18000000",
+#  "high": "6441.37000000",
+#  "low": "5261.69000000",
+#  "volume": "53687.76764233",
+#  "last": "6250.02000000",
+#  "volume_30day": "786763.72930864",
+#  "rfq_volume_24hour": "78.23",
+#  "conversions_volume_24hour": "0.000000",
+#  "rfq_volume_30day": "0.000000",
+#  "conversions_volume_30day": "0.000000"
+#}
+
+outputb=$(curl -L -s "https://api.exchange.coinbase.com/products/${prod_id}/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/')
 
 echo -n "$outputb" $'\r'
 
@@ -2747,7 +2780,7 @@ do
 clear
 #sleep 1s
 
-outputb=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/stats )
+outputb=$(curl -s https://api.exchange.coinbase.com/products/${prod_id}/stats )
 printf  "$outputb" '\r' | jq
 
 if read -r -N 1 -t 5; then
@@ -2876,7 +2909,12 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     #columns=$(tput cols)
     #lines=$(tput lines)
     #fold  -w "$columns" -bs  DOCS/btc2usd.txt
-    BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    prod_id="BTC-USD"
+
+    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+
+    BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
+
     echo "BTC = $"$BTCBTC
     read -p " Enter the BTC amount you want to buy/sell : " c
     USDONION=$(echo $BTCBTC*$c | bc)
@@ -2889,7 +2927,11 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     2)    echo " Calculate Amount of ONION For Amount of BTC "
     echo "This can be used to find the amount of any crypto."
     echo "Just enter the current price of your favorite COIN/TOKEN."
-    BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    prod_id="BTC-USD"
+    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+
+    BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
+
     echo "BTC = $"$BTCBTC
     read -p " Enter The Price of ONION : " u
     read -p " Enter the Amount of fiat to SPEND : " USDONION
@@ -2901,7 +2943,9 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     i=0
     ;;
     3)    echo " Calculate BTC Cost "
-    BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    prod_id="BTC-USD"
+    BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
     echo "BTC = $"$BTCBTC
     read -p " Enter Amount of BTC : " y
     AmountOfBTC=$(echo $y*$BTCBTC | bc)
@@ -2912,7 +2956,9 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     i=0
     ;;
     4)    echo " Calculate Amount of BTC "
-    BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    prod_id="BTC-USD"
+    BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
     echo "BTC = $"$BTCBTC
     read -p " Enter Amount of USD : " w
     AmountOfBTC=$(echo "scale=8;$w/$BTCBTC" | bc )
@@ -2949,7 +2995,9 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     ;;
     8)
 ##############################################################################
-
+#prod_id="BTC-USD"
+#
+#    read -p " " n
 
 
 ##############################################################################
@@ -2957,9 +3005,12 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
    ;;
    9)
 ##############################################################################
+#(curl -L "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
 
+#read -p " " n
+#(curl -L "https://api.exchange.coinbase.com/products/btc-usd/stats" -H "Content-Type: application/json" | jq )
 
-
+#read -p " " n
 ##############################################################################
     i=1
     ;;
