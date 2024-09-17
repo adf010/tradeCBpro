@@ -30,7 +30,7 @@ I appreciate any and all feedback. Suggestions, PR's, issues, questions, etc. ar
 WHAT WORKS
 List Acounts
 Get Account
-Best Bid/Ask (only options 1 and 2)
+Best Bid/Ask
 Product Book
 
 Create Order (market and limit_gtc only)

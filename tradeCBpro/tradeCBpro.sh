@@ -335,10 +335,11 @@ echo
 method="GET"
 requestpath="/api/v3/brokerage/best_bid_ask"
 product_ids="product_ids"
+product_id=""
 
 echo "To display all products enter          1 "
 echo "To display one product enter           2 "
-echo "To display two or more products enter  3 "
+echo "To display one or more products enter  3 "
 echo
 read -p "Enter your choice : " choose
 
@@ -346,7 +347,7 @@ if [[ $choose == 1 ]]; then
 BODY=""
 elif [[ $choose == 2 ]];then
 echo
-read -p "Enter Product id string ( ex. BTC-USD )" product_id
+read -p "Enter Product id string " product_id
 product_id=${product_id^^}
 BODY="${qmark}${product_ids}${eq1}${product_id^^}"
 else
@@ -358,7 +359,7 @@ declare -a new_order_array
    echo "Be sure to press ENTER after every entry. Then "
    echo "Use <CTRL> d when finished."
    echo -e '\E[32;40m'"\033[1m"
-   echo "Enter PRODUCT id (MUST BE UPPERCASE): "
+   echo "Enter PRODUCT id (MUST BE UPPERCASE ex. BTC-USD): "
    k=0
    while read line
    do
@@ -391,6 +392,8 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
+    unset order_array
+    unset new_order_array
 
 ##################################################################
     i=0
@@ -447,7 +450,7 @@ fi
     i=0
     ;;
     3)
-####  NOT FINISHED  WORKS  ####
+#####  WORKS  #####  TODO: add options
 ###########################################################################
 # GET LIST PRODUCTS
 # GET https://api.coinbase.com/api/v3/brokerage/products
@@ -521,7 +524,9 @@ echo
     tradability_status1="true"
 
     read -p "Enter desired product ( BTC-USD ) : " product_id1
-    read -p "Enter true or false for tradability status : " tradability_status1
+    echo
+    echo "(Tradability is only enabled for SPOT products.)"
+    read -p "Enter true or false for tradability status  : " tradability_status1
     product_id1=${product_id1^^}
 
    requestpath="/api/v3/brokerage/products/${product_id1}"
@@ -732,7 +737,7 @@ read -p "Enter a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" x
     i=0
     ;;
 
-    1)
+    1)         #   TODO: add options
  #############################################################################################
 #  ORDERS
 # POST https://api.coinbase.com/api/v3/brokerage/orders
