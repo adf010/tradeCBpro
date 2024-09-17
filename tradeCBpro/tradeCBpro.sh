@@ -193,7 +193,11 @@ read -p "Enter limit of accounts to display (or 0 for all) : " limit0
 
 while true; do
 
+if [[ "$cursor1" != "" ]]; then
+page0="$cursor1"
+else
 page0=$(cat $PATH0 | grep -w cursor | tr -d '"' | sed 's/,*$//g' | sed 's/cursor://' | tr -d " ")
+fi
 
 BODY="${limit}${eq1}${limit0}${amps}${cursor0}${eq1}${page0}${amps}${retail_portfolio_id0}${eq1}${retail_portfolio_id1}"
 
@@ -218,6 +222,7 @@ case $yn in
         touch "$PWD"/CB-output.json
         break;;
         [Nn]* )
+       read -p "Enter cursor ID for start of list or press ENTER : " cursor1
        read -p "Enter limit of accounts to display (required) : " limit0
 
        echo -e '\E[32;40m'"\033[1m"
@@ -785,7 +790,7 @@ echo
 
 
     echo "quote=BUY only / base=BUY or SELL"
-    read -p "Enter QUOTE(buy) or BASE(sell) amount :" quantity
+    read -p "Enter QUOTE(buy) or BASE(sell) quantity :" quantity
     if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
     read -p "Enter Limit price: " limit_price1
     fi
@@ -2211,7 +2216,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     fold -w "$columns" -bs  DOCS/portfolio_breakdown.txt
     echo
 
-    read -p " " n
+    #read -p " " n
 
     method="GET"
     portfolio_uuid=""
@@ -2886,13 +2891,12 @@ read -p "This section does nothing at this time. Press ENTER to exit : " n
 echo "Main Menu                       = 0"
 echo "Calculate BTC to USD            = 1"
 echo "Calculate Amount of ONION       = 2"
-echo "Calculate BTC Cost              = 3"
-echo "Calculate Amount of BTC         = 4"
-echo "Use Custom BTC Price for Amount = 5"
-echo "Use Custom Amount For Cost      = 6"
-echo "Market buy/sell fee             = 7"
+echo "Calculate Amount of BTC         = 3"
+echo "Use Custom BTC Price for Amount = 4"
+echo "Use Custom Amount For Cost      = 5"
+echo "Market buy/sell fee             = 6"
 echo
-read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
+read -p "Type a number [0, 1, 2, 3, 4, 5, 6] :" a
 
     case $a in
 
@@ -2911,8 +2915,6 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     #fold  -w "$columns" -bs  DOCS/btc2usd.txt
     prod_id="BTC-USD"
 
-    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
-
     BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
 
     echo "BTC = $"$BTCBTC
@@ -2924,11 +2926,12 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     echo
     i=0
     ;;
-    2)    echo " Calculate Amount of ONION For Amount of BTC "
+    2)
+    clear
+    echo " Calculate Amount of ONION For Amount of BTC "
     echo "This can be used to find the amount of any crypto."
     echo "Just enter the current price of your favorite COIN/TOKEN."
     prod_id="BTC-USD"
-    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
 
     BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
 
@@ -2942,33 +2945,23 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     echo
     i=0
     ;;
-    3)    echo " Calculate BTC Cost "
-    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
-    prod_id="BTC-USD"
-    BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
-    echo "BTC = $"$BTCBTC
-    read -p " Enter Amount of BTC : " y
-    AmountOfBTC=$(echo $y*$BTCBTC | bc)
-    echo " Your USD Cost of BTC = "$AmountOfBTC
-    read -p "Hit ENTER to continue" g
-    echo
-    echo
-    i=0
-    ;;
-    4)    echo " Calculate Amount of BTC "
-    #BTCBTC=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    3)
+    clear
+    echo " Calculate Amount of BTC "
     prod_id="BTC-USD"
     BTCBTC=$(curl -L -s "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
     echo "BTC = $"$BTCBTC
     read -p " Enter Amount of USD : " w
     AmountOfBTC=$(echo "scale=8;$w/$BTCBTC" | bc )
-    echo " Your Amount of BTC (or any fiat) = " $AmountOfBTC
+    echo " Your Amount of BTC = " $AmountOfBTC
     read -p "Hit ENTER to continue" g
     echo
     echo
     i=0
     ;;
-    5)    echo " Use Custom BTC Price to find Amount "
+    4)
+    clear
+    echo " Use Custom BTC Price to find Amount "
     read -p " Enter a Custom Price for BTC : " u
     read -p " Enter an Amount of USD : " t
     AmountOfBTC=$(echo "scale=8;$t/$u" | bc )
@@ -2978,7 +2971,9 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     echo
     i=0
     ;;
-    6)    echo " Use Custom Price to Find BTC Amount for USD Cost "
+    5)
+    clear
+    echo " Use Custom Price to Find BTC Amount for USD Cost "
     read -p " Enter a Custom Price for BTC : " s
     read -p " Enter an Amount of BTC : " AmountofBTC
     CostOfBTC=$(echo "$s*$AmountofBTC" | bc )
@@ -2986,14 +2981,16 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
     read -p "Hit ENTER to continue" g
     i=1
     ;;
-    7)    read -p " Enter USD amount : " zz
-          read -p " Enter Fee % ( ex. .55 ) : " yy
+    6)
+    clear
+    read -p " Enter USD amount : " zz
+    read -p " Enter Fee % ( ex. .55 ) : " yy
     AmountOfFee=$(echo "scale=2;$yy*$zz/100" | bc)
     echo " Fee is About : " $AmountOfFee
     read -p "Press ENTER to return to menu: " n
     i=1
     ;;
-    8)
+    7)
 ##############################################################################
 #prod_id="BTC-USD"
 #
@@ -3003,7 +3000,7 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7] :" a
 ##############################################################################
    i=0
    ;;
-   9)
+   8)
 ##############################################################################
 #(curl -L "https://api.exchange.coinbase.com/products/btc-usd/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/' | tr -d '$' )
 
