@@ -1,9 +1,0 @@
-REMOVE SENSITIVE INFORMATION
-
-WARNING!!! This option is destructive and irreversable. 
-
-You should ONLY use this option if you have backups of your API keys in another location or on another device.
-
-
-
-

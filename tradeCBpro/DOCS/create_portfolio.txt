@@ -2,4 +2,5 @@ CREATE PORTFOLIO
 
 Create a portfolio.
 
+Just enter a name for the Portfolio and it will be created.
 

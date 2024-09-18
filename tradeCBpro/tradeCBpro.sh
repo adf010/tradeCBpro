@@ -503,7 +503,7 @@ echo
 ##################################################################
     i=0
     ;;
-    4) # TODO:  NEED TO ADD TRADABILITY
+    4)
  #########################################################################################
     # GET  GET PRODUCT
     # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products?product_ids=BTC-USD' \
@@ -548,7 +548,7 @@ echo
     ;;
     5)
 #  NOT FINISHED #####################################################################################
-    #    TODO: ADD GRANULARITY INFO
+    #    TODO: ADD GRANULARITY ARRAY
 #####################################################################################
 # GET PRODUCT CANDLES
 # GET https://api.coinbase.com/api/v3/brokerage/products/{product_id}/candles
@@ -576,7 +576,7 @@ echo
 echo
 product_id="product_id"
 product_id1=" "
-start0="start"   # string
+start0="start"
 end0="end"
 start1=""
 end1=""
@@ -584,7 +584,6 @@ limit0="limit"
 limit1=""
 granularity="granularity"
 granularity1=""
-#requestpath="/api/v3/brokerage/products/${product_id1^^}/candles"
 method="GET"
 
 read -p "Enter Product trading pair id (BTC-USD) : " product_id1
@@ -793,7 +792,6 @@ echo
     curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | jq .
     echo -e '\E[32;40m'"\033[1m"
 
-
     echo "quote=BUY only / base=BUY or SELL"
     read -p "Enter QUOTE(buy) or BASE(sell) quantity :" quantity
     if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
@@ -805,7 +803,6 @@ echo
     echo "market= " $prod_id
     prod_id=${prod_id^^}
     echo "quote/base amount= " $quantity
-
 
     price1=$(echo $quantity*$PRODPRICE | bc)
 
@@ -928,7 +925,6 @@ TIMESTAMP=$(date +%s)
  -d "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
 
-###################################################################
 ###################################################################
     i=0
     ;;
@@ -1316,7 +1312,6 @@ base_size=
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}/api/v3/brokerage/orders/preview" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-
 (curl -L -s -X "GET" "https://api.coinbase.com/api/v3/brokerage/orders/preview" \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1480,7 +1475,7 @@ echo
     (curl -L -X "GET" "${BENDPOINT}${requestpath}${BODY}" \
     -H 'Content-Type: application/json' | jq -r . > CB-output.json )
     $editor CB-output.json
-###################################################################
+
 ###################################################################
     i=0
     ;;
@@ -1584,7 +1579,6 @@ BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end
     i=0
      ;;
      7)
-###################################################################
 ###################################################################
     i=0
     j=0
@@ -2304,8 +2298,6 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     fold -w "$columns" -bs  DOCS/create_portfolio.txt
     echo
 
-  #read -p " " n
-
     method="POST"
     name0="name"
     portfolio_name1=""
@@ -2314,14 +2306,10 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
 
     requestpath="/api/v3/brokerage/portfolios"
     BODY="{\"${name0}\":\"${portfolio_name1}\"}"
-    #BODY="'{\"${name0}\":\"${portfolio_name1}\"}'"
-    #echo ${BODY}
-    #read -p " " n
 
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
- #(curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}" -v  \
   (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2331,7 +2319,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   -d "${BODY}" \
   | jq . > CB-output.json )
   $editor CB-output.json
-#read -p " " n
+
     i=0
     ;;
     4)
@@ -2425,7 +2413,6 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   -d "${BODY}" \
   | jq . > CB-output.json )
   $editor CB-output.json
-#read -p " " n
 
     i=0
     ;;
@@ -2454,9 +2441,6 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
 
   BODY="{\"funds\":{\"value\":\""${amount1}"\",\"currency\":\""${currency1}"\"},\"source_portfolio_uuid\":\""${uuid1}"\",\"target_portfolio_uuid\":\""${uuid2}"\"}"
 
-  #echo ${BODY}
-  #read -p " " n
-
 #-d '{"funds":{"value":"1.00","currency":"usd"},"source_portfolio_uuid":"12345","target_portfolio_uuid":"54321"}'
 
  TIMESTAMP=$(date +%s)
@@ -2471,9 +2455,6 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   -d "${BODY}" \
   | jq . > CB-output.json )
   $editor CB-output.json
-#read -p " " n
-
-
 
     i=0
     ;;
@@ -2639,10 +2620,6 @@ echo -e '\E[32;40m'"\033[1m"
 ##### 999999999999999999999999999999999999999999999999999999999999999
 
 
-
-
-
-
 #####################################################################
 ###  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     elif [[ "$m" == "10" ]]; then
@@ -2682,8 +2659,6 @@ read -p "Type a number [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] :" x
 
 read -p "Press ENTER to close window. " y
 
-  #   | jq -r . > CB-output.json )
-  # $editor CB-output.json
  #############################################################
     i=0
     ;;
@@ -2757,9 +2732,6 @@ if read -r -N 1 -t 2; then
     fi
 
 done
-
-
-
 
 #####################################################################
    i=0
@@ -2843,10 +2815,6 @@ done
   #  lines=$(tput lines)
   #  fold  -w "$columns" -bs DOCS/cdp_key_permissions.txt
   #  echo
-
-
-
-
 #####################################################################
     i=0
     ;;
@@ -2862,24 +2830,22 @@ echo
 read -n 1 -s -r -p "Press any key to continue"
 
 #####################################################################
-
     i=0
     ;;
     9)
-#   REMOVE SENSITIVE INFORMATION
+#
 #####################################################################
  #
  #
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs  DOCS/remove_info.txt
+fold -w "$columns" -bs  DOCS/.txt
 echo
 
-read -p "This section does nothing at this time. Press ENTER to exit : " n
+#read -p "This section does nothing at this time. Press ENTER to exit : " n
 
-
- #####################################################################
+#####################################################################
     i=0
     ;;
     10)
