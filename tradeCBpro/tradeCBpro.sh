@@ -399,7 +399,6 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
     i=0
     ;;
     2)
-#    NOT FINISHED    ####  add - aggregation_price_increment
 #################################################################################
 # GET PRODUCT BOOK
 # GET https://api.coinbase.com/api/v3/brokerage/product_book
@@ -547,14 +546,12 @@ echo
     i=0
     ;;
     5)
-#  NOT FINISHED #####################################################################################
-    #    TODO: ADD GRANULARITY ARRAY
-#####################################################################################
+##########################################################################################
 # GET PRODUCT CANDLES
 # GET https://api.coinbase.com/api/v3/brokerage/products/{product_id}/candles
 # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products/BTC-USD/candles?start=12345&end=23456&granularity=FIVE_MINUTE' \
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getcandles
-############################################################################################
+##########################################################################################
 # Get rates for a single product by product ID, grouped in buckets.
 # ADD < PRODUCT ID , START (UNIX) , END (UNIX) , GRADULARITY
 
@@ -564,16 +561,21 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/product_candles.txt
 echo
 
-echo "ONE_MINUTE"
-echo "FIVE_MINUTE"
-echo "FIFTEEN_MINUTE"
-echo "THIRTY_MINUTE"
-echo "ONE_HOUR"
-echo "TWO_HOUR"
-echo "SIX_HOUR"
-echo "ONE_DAY"
+echo "Granularity choices"
+echo
+echo "1= ONE_MINUTE"
+echo "2= FIVE_MINUTE"
+echo "3= FIFTEEN_MINUTE"
+echo "4= THIRTY_MINUTE"
+echo "5= ONE_HOUR"
+echo "6= TWO_HOUR"
+echo "7= SIX_HOUR"
+echo "8= ONE_DAY"
 echo
 echo
+
+array_gran=("ONE_MINUTE" "FIVE_MINUTE" "FIFTEEN_MINUTE" "THIRTY_MINUTE" "ONE_HOUR" "TWO_HOUR" "SIX_HOUR" "ONE_DAY")
+
 product_id="product_id"
 product_id1=" "
 start0="start"
@@ -582,24 +584,28 @@ start1=""
 end1=""
 limit0="limit"
 limit1=""
+index1=""
 granularity="granularity"
 granularity1=""
 method="GET"
 
 read -p "Enter Product trading pair id (BTC-USD) : " product_id1
-echo "Format start time as 2024-05-27 20:55Z"
+echo "Format start time as mm/dd/yyyy hh:mm or mm/dd/yyyy"
 read -p "Enter start time : " start1
 start1=$(date -u -d "$start1" +%s)
-echo "Format end time as 2024-08-27 20:55Z"
+echo "Format end time as mm/dd/yyyy hh:mm or mm/dd/yyyy"
 read -p "Enter end time : " end1
 end1=$(date -u -d "$end1" +%s)
 
-read -p "Enter limit (# of candle buckets returned default/max is 350)" limit1
-read -p "Enter Granularity from choices listed above : " granularity1
+read -p "Enter Granularity from choices listed above : " index1
+index1=$(($index1 - 1))
+granularity1=${array_gran["index1"]}
+read -p "Enter limit (# of candle buckets returned default/max is 350 *Optional)" limit1
+limit1=$((limit1))
 
 requestpath="/api/v3/brokerage/products/${product_id1^^}/candles"
 
-BODY="${qmark}${start0}${eq1}${start1}${amps}${end0}${eq1}${end1}${amps}${limit1}${eq1}${limit1}${amps}${granularity}${eq1}${granularity1}"
+BODY="${qmark}${start0}${eq1}${start1}${amps}${end0}${eq1}${end1}${amps}${limit0}${eq1}${limit1}${amps}${granularity}${eq1}${granularity1}"
 
 echo ${product_id1^^}
 echo $start1
@@ -1101,8 +1107,6 @@ order_type1=("market_market_ioc" "limit_limit_gtc" "limit_limit_gtd")
   order_status0=${order_status1[dow-1]}
   fi
 
-  echo -e '\E[32;40m'"\033[1m"
-    echo -e '\E[32;40m'"\033[1m"
     echo -e '\E[33;40m'"\033[1m"
     echo "You entered (read carefully):"
     echo "You entered "${product_id}" for the Product id."
@@ -1123,8 +1127,8 @@ qmark="?"
 method="GET"
 requestpath="/api/v3/brokerage/orders/historical/batch"
 BODY="product_id=${product_id}&order_side=${side0^^}&order_status=${order_status0}"
-echo $BODY
-read -p "" n
+#echo $BODY
+#read -p "" n
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
@@ -1187,7 +1191,7 @@ PATH0="$PWD"/CB-output.json
 rm "$PWD"/CB-output.json
 touch "$PWD"/CB-output.json
 echo -e '\E[32;40m'"\033[1m"
-read -p "Enter Retail Portfolio ID or press ENTER for default : " retail_portfolio_id1
+read -p "Enter Retail Portfolio ID or press ENTER for default ID : " retail_portfolio_id1
 read -p "Enter limit of filled orders to display  : " limit1
 
 # curl -L 'https://api.coinbase.com/api/v3/brokerage/orders/historical/fills?product_ids=btc-usd&product_ids=doge-usd'
@@ -1195,7 +1199,7 @@ read -p "Enter limit of filled orders to display  : " limit1
 
 while true; do
   read -p "Enter the Product id (required) (ex. BTC-USD) " product_id1; product_id1=${product_id1^^}
-
+  #read -p "Enter limit of filled orders to display  : " limit1
   # "trade_time": "2024-08-21T21:20:54.193Z",   <-- from output
 
 page0=$(cat $PATH0 | grep -w cursor | tr -d '"' | sed 's/,*$//g' | sed 's/cursor://' | tr -d " ")
