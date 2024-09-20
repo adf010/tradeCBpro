@@ -1,6 +1,7 @@
 LIVE STATS
 
-Live stats shows the current price of Coinbase™ trading pairs about every 5 second>
+Live stats shows the current stats of Coinbase™ trading pairs about every 5 seconds. The 
+default is BTC-USD but you can enter other pairs.
 
-To exit the ticker, press any key.
+To exit stats, press any key.
 

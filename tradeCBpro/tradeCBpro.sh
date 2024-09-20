@@ -2707,29 +2707,12 @@ echo -e '\E[32;40m'"\033[1m"
 do
 
 sleep 1s
-# outputb=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
 #curl https://api.coinbase.com/v2/prices/${prod_id}/spot
-
 # https://api.exchange.coinbase.com/products/{product_id}/stats
-# output
-# {
-#  "open": "5414.18000000",
-#  "high": "6441.37000000",
-#  "low": "5261.69000000",
-#  "volume": "53687.76764233",
-#  "last": "6250.02000000",
-#  "volume_30day": "786763.72930864",
-#  "rfq_volume_24hour": "78.23",
-#  "conversions_volume_24hour": "0.000000",
-#  "rfq_volume_30day": "0.000000",
-#  "conversions_volume_30day": "0.000000"
-#}
 
 outputb=$(curl -L -s "https://api.exchange.coinbase.com/products/${prod_id}/ticker" -H "Content-Type: application/json" | jq -r ".price" | sed -E 's/(.+)/$\1/')
 
 echo -n "$outputb" $'\r'
-
-#outputbtc="${outputb%.*}"
 
 if read -r -N 1 -t 2; then
         break
