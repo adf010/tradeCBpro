@@ -1,5 +1,5 @@
 #!/bin/bash
-CURRVER=0.9-beta.3
+CURRVER=0.9-beta.8
 cd "${0%/*}"
 #
 #
