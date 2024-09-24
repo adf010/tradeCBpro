@@ -27,6 +27,7 @@ echo "Keys will be 'forgotten' when you exit script. "
 echo "Optionally you can Enter KEY/SECRET into respective files or use the menu "
 echo "option which retains your keys until deleted or using the Remove Keys option."
 echo "If you want to store keys then just press ENTER twice to start script."
+echo "Then use option 8 on the menu. "
 read -p "Enter API key: " COINBASE_KEY
 read -p "Enter API secret: " COINBASE_SECRET
 fi
@@ -449,7 +450,6 @@ fi
     i=0
     ;;
     3)
-#####  WORKS  #####  TODO: add options
 ###########################################################################
 # LIST PRODUCTS
 # GET https://api.coinbase.com/api/v3/brokerage/products
@@ -458,33 +458,89 @@ fi
 ###########################################################################
 # Get a list of the available currency pairs for trading.
 
-# TODO: add limit, offset, product_type, product_ids, contract_expiry_type, expiring_contract_status, get_tradability_status, get_all_products
-
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs  DOCS/list_products.txt
+fold -w "$columns" -bs DOCS/list_products.txt
 echo
 
+array_gap=("TRUE" "FALSE")
+array_prodtype=("SPOT" "FUTURE" "UNKNOWN_PRODUCT_TYPE")
+array_expiry_type=("EXPIRING" "PERPETUAL" "UNKNOWN_CONTRACT_EXPIRY_TYPE")
+array_expiring_contract_status=("STATUS_ALL" "STATUS_EXPIRED" "STATUS_UNEXPIRED" "UNKNOWN_EXPIRING_CONTRACT_STATUS")
+array_gts=("TRUE" "FALSE")
+
     method="GET"
-    offset="offset"
-    product_type="product_type"
-    product_id="product_id"
-    contract_expiry_type="contract_expiry_type"
-    expiring_contract_status="expiring_contract_status"
+    offset0="offset"
+    product_type0="product_type"
+    product_ids0="product_ids"
+    contract_expiry_type0="contract_expiry_type"
+    expiring_contract_status0="expiring_contract_status"
+    limit0="limit"
     limit1=""
     offset1=""
     product_type1=""
-    product_id1=""
+    product_ids1=""
     contract_expiry_type1=""
-    expiring_contract_status=""
+    expiring_contract_status1=""
+    get_all_products0="get_all_products"
+    get_all_products1=""
+    get_tradability_status0="get_tradability_status"
+    get_tradability_status1=""
     requestpath="/api/v3/brokerage/products"
 
-    read -p "Enter Product id(s) (ex. BTC-USD) : " product_id1
-    product_id1=${product_id1^^}
     read -p "Enter limit of how many products to return : " limit1
+    read -p "Enter offset number : " offset1
+    read -p "Enter Product Type (1=SPOT, 2=FUTURE, 3=UNKNOWN_PRODUCT_TYPE : )" index2
+    index2=$(($index2 - 1))
+    product_type1=${array_prodtype["index2"]}
 
-    BODY="${qmark}${limit}${eq1}${limit1}${amps}${product_id}${eq1}${product_id1}"
+   declare -a order_array
+   declare -a new_order_array
+   echo
+   echo
+   echo -e '\E[31;40m'"\033[1m"
+   echo "Be sure to press ENTER after every entry. Then "
+   echo "Use <CTRL> d when finished."
+   echo "(If leaving blank, do not press Enter. Just press <CTRL> d)"
+   echo -e '\E[32;40m'"\033[1m"
+   echo "Enter PRODUCT id(s) (MUST BE UPPERCASE ex. BTC-USD): "
+   k=0
+   while read line
+   do
+    lines="$line"
+    lines+=(\""$line"\",)
+    order_array=("${order_array[@]}" \""$lines"\",)
+    order_array=( "${order_array[@]}" )
+    new_order_array[$k]=$(echo ${product_ids0}${eq1}${order_array[$k]}${amps})
+    k=$(expr $k + 1)
+    line=""
+   done
+
+body0=${new_order_array[*]}
+BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[][]//g' | sed 's/"//g' | sed 's/.$//' | tr -d "," | tr -d ' ' )
+
+    read -p "Enter contract_expiry_type (1=EXPIRING, 2=PERPETUAL, 3=UNKNOWN_CONTRACT_EXPIRY_TYPE) : " index3
+    index3=$(($index3 - 1))
+    contract_expiry_type1=${array_expiry_type["index3"]}
+    echo
+
+    read -p "Enter expiring_contract_status (1=STATUS_ALL, 2=STATUS_EXPIRED, 3=STATUS_UNEXPIRED, 4=UNKNOWN_EXPIRING_CONTRACT_STATUS) : " index4
+    index4=$(($index4 - 1))
+    expiring_contract_status1=${array_expiring_contract_status["index4"]}
+    echo
+
+    read -p "Enter Tradability Status (1=TRUE, 2=FALSE)" index5
+    index5=$(($index5 - 1))
+    get_tradability_status1=${array_gts["index5"]}
+    echo
+
+    read -p "Do you want to get all Products (1=TRUE, 2=FALSE) : " index1
+    index1=$(($index1 - 1))
+    get_all_products1=${array_gap["index1"]}
+    echo
+
+    BODY="${qmark}${limit}${eq1}${limit1}${amps}${offset0}${eq1}${offset1}${amps}${product_type0}${eq1}${product_type1}${amps}${BODY1}${amps}${contract_expiry_type0}${eq1}${contract_expiry_type1}${amps}${expiring_contract_status0}${eq1}${expiring_contract_status1}${amps}${get_tradability_status0}${eq1}${get_tradability_status1}${amps}${get_all_products0}${eq1}${get_all_products1}"
     echo ${BODY}
     read -p "Press ENTER to continue: " n
 
@@ -499,6 +555,7 @@ echo
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
+
 ##################################################################
     i=0
     ;;
@@ -901,7 +958,7 @@ declare -a new_order_array
    echo "Be sure to press ENTER after every entry. Then "
    echo "Use <CTRL> d when finished."
    echo -e '\E[32;40m'"\033[1m"
-   echo "Enter ORDER ID : "
+   echo "Enter ORDER ID(s) : "
 
 k=0
 while read line
@@ -921,21 +978,22 @@ BODY="{\"${order_ids0}\":[${BODY1}]}"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-( curl -L -s "${BENDPOINT}${requestpath}"  \
+ #echo "${BODY}"
+ #read -p " " n
+
+( curl -L "${BENDPOINT}${requestpath}" -d "${BODY}" -v \
  -X ${method} \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-SIGN: $SIG" \
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
- --header "CB-VERSION: $CBVERSION" \
- -d "${BODY}" | jq -r . > CB-output.json )
+ --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
 
 ###################################################################
     i=0
     ;;
     3)
-#   NOT FINISHED    ##
 ###########################################################################################
 #####  EDIT ORDER
 ###########################################################################################
@@ -956,7 +1014,7 @@ TIMESTAMP=$(date +%s)
  size1=""
  price0="price"
  price1=""
- order_id="order_id"
+ order_id0="order_id"
  order_id1=""
 
  read -p "Enter order id : " order_id1
@@ -965,27 +1023,26 @@ TIMESTAMP=$(date +%s)
 
  method="POST"
  requestpath="/api/v3/brokerage/orders/edit"
- BODY="'{"${order_id}":"${order_id1}","${price}":"${price1}","${size0}":"${size1}"}'"
+ BODY="{\"${order_id0}\":\"${order_id1}\",\"${price0}\":\"${price1}\",\"${size0}\":\"${size1}\"}"
  echo "${BODY}"
    read -p "Press ENTER to continue : " n
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L  "${BENDPOINT}${requestpath}" -d "${BODY}" -v \
  -X ${method}  \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
  --header "CB-ACCESS-SIGN: $SIG" \
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
- --header "CB-VERSION: $CBVERSION"   \
- --data-raw ${BODY} | jq -r . > CB-output.json )
+ --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
 
 ###################################################################
     i=0
     ;;
     4)
-#  TODO:  NOT FINISHED    ####################################################################
+##############################################################################################
 #####  ORDER EDIT PREVIEW
 ##############################################################################################
 # POST https://api.coinbase.com/api/v3/brokerage/orders/edit_preview
@@ -996,26 +1053,38 @@ TIMESTAMP=$(date +%s)
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs  DOCS/preview_order_request.txt
+fold -w "$columns" -bs  DOCS/edit_order_preview.txt
+echo
 
-method="POST"
+ size0="size"
+ size1=""
+ price0="price"
+ price1=""
+ order_id0="order_id"
+ order_id1=""
+
+ read -p "Enter order id : " order_id1
+ read -p "Enter price : " price1
+ read -p "Enter size : " size1
+
+ method="POST"
  requestpath="/api/v3/brokerage/orders/edit_preview"
- read -p "Enter Order UUID: " n
- BODY="'{\"order_ids\":"${ids2}"}'"
-
+ BODY="{\"${order_id0}\":\"${order_id1}\",\"${price0}\":\"${price1}\",\"${size0}\":\"${size1}\"}"
+ echo "${BODY}"
+   read -p "Press ENTER to continue : " n
  TIMESTAMP=$(date +%s)
- SIG=$(echo -n "${TIMESTAMP}${method}/api/v3/brokerage/orders/edit_preview" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s 'https://api.coinbase.com/api/v3/brokerage/orders/edit_preview' \
--X ${method}  \
--H 'Content-Type: application/json' \
---header "CB-ACCESS-KEY: $COINBASE_KEY" \
+(curl -L  "${BENDPOINT}${requestpath}" -d "${BODY}" -v \
+ -X ${method}  \
+ -H 'Content-Type: application/json' \
+ --header "CB-ACCESS-KEY: $COINBASE_KEY" \
  --header "CB-ACCESS-SIGN: $SIG" \
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
- --header "CB-VERSION: $CBVERSION"   \
---data-raw '{"order_id":"4","price":"0","size":"2"}' | jq -r . > CB-output.json )
-$editor CB-output.json
+ --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
+ $editor CB-output.json
 
+ ############################################################################################
     i=0
     ;;
     5)
@@ -1277,7 +1346,7 @@ $editor CB-output.json
     i=0
     ;;
     8)
-#   NOT FINISHED    TODO: options
+#   WORKS BUT NOT FINISHED    TODO: options
 ######################################################################################
 #####   PREVIEW ORDER REQUEST
 ######################################################################################
@@ -1293,38 +1362,124 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/preview_order.txt
 echo
 
-# curl -L 'https://api.coinbase.com/api/v3/brokerage/orders/preview' \
-# -H 'Content-Type: application/json' \
-# -d '{"product_id":"btc-osd","side":"SELL","order_configuration":{"limit_limit_gtc":{"base_size":".014","limit_price":"61275.00","post_only":true}}}'
-
-product_id=
-side=
-commission_rate=
-value=
-order_configuration=
-market_market_ioc=
-quote_size=
-base_size=
-# TODO: Ton more... see DOC page
-
+ limit_price0="limit_price"
+ limit_price1=""
+ post_only0="post_only"
+ post1=""
  method="POST"
- requestpath="/api/v3/brokerage/orders/preview"
- BODY="'{\"order_ids\":"${ids2}"}'"
- #echo "${BODY}"
-   read -p "Press ENTER to continue to Main Menu : " n
-   break
- TIMESTAMP=$(date +%s)
- SIG=$(echo -n "${TIMESTAMP}${method}/api/v3/brokerage/orders/preview" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s -X "GET" "https://api.coinbase.com/api/v3/brokerage/orders/preview" \
+  basequote1=("quote_size" "base_size")
+  side1=("BUY" "SELL")
+  post1=("true" "false")
+
+
+ orderconfig1=("market_market_ioc" "limit_limit_gtc" "limit_limit_gtd")
+  read -p "Is this a MARKET or LIMIT order?  Default = [market]:" orderconfig ; orderconfig=${orderconfig:-market}
+  orderconfig=${orderconfig,,}
+
+  if [[ $orderconfig == "market" ]]; then
+  orderconfig0=${orderconfig1[dow-0]}
+  elif [[ "$orderconfig" == "limit" ]]; then
+  orderconfig0=${orderconfig1[dow-2]}
+  #basequote0=${basequote1[dow-1]}
+  elif [[ "$orderconfig" == "limit2" ]]; then
+  orderconfig0=${orderconfig1[dow-1]}
+  fi
+
+  read -p "Is this a BUY or SELL order? Default = [BUY]:" side1 ; side1=${side1:-BUY}
+  side1=${side1^^}
+  side0=${side1[dow-0]}
+  basequote0=${basequote1[dow-0]}
+  if [[ $side1 == "SELL" ]]; then
+  side0=${side1[dow-1]}
+  basequote0=${basequote1[dow-1]}
+  fi
+
+    while true; do
+    read -p "Which market would you like Default = [DOGE-USD]:" prod_id ; prod_id=${prod_id:-DOGE-USD}
+    prod_id=${prod_id^^}
+    BTCPRICE=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    PRODPRICE=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    echo "The current price of "$prod_id" is "$PRODPRICE"    ."
+    curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | jq .
+    echo -e '\E[32;40m'"\033[1m"
+
+    echo "quote=BUY only / base=BUY or SELL"
+    read -p "Enter QUOTE(buy) or BASE(sell) quantity :" quantity
+    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
+    read -p "Enter Limit price: " limit_price1
+    fi
+    echo -e '\E[33;40m'"\033[1m"
+    echo "This is a "${orderconfig0}" "${side0^^}" order."
+    echo "You entered (read carefully):"
+    echo "market= " $prod_id
+    prod_id=${prod_id^^}
+    echo "quote/base amount= " $quantity
+
+    price1=$(echo $quantity*$PRODPRICE | bc)
+
+    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
+    read -p "Post only (true or false) Default = [true]:" post1 ; post1=${post1:-true}
+    post1=${post1,,}
+    post0=${post1[dow-0]}
+    basequote0=${basequote1[dow-1]}
+    elif [[ $post1 == "false" ]]; then
+    post0=${post1[dow-1]}
+    basequote0=${basequote1[dow-1]}
+    fi
+
+    echo "price=  ~" $price1 " + fee"
+    echo
+    read -p "Are the above values what you wanted ?" yn
+    echo -e '\E[32;40m'"\033[1m"
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) continue;;
+        * ) echo "Please answer yes or no. ( Or y or n )";;
+    esac
+  done
+    while true; do
+     echo -e '\E[31;40m'"\033[1m"
+   read -p "Would you like to execute this transaction? ( y or n )" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exec $0;;
+        * ) echo "Please answer yes or no.";;
+    esac
+  done
+   echo -e '\E[32;40m'"\033[1m"
+
+requestpath="/api/v3/brokerage/orders/preview"
+# UUID1=$(uuidgen)
+PROD_ID=${prod_id}
+
+BODY="{\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\"}}}"
+
+ BODYLGTC="{\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
+
+if [[ ${orderconfig0} == "limit_limit_gtc" ]]; then
+BODY=${BODYLGTC}
+fi
+
+echo $BODY
+read -p "Last chance to check your information. Press ENTER if satisfied else <CTRL> c " n
+
+TIMESTAMP=$(date +%s)
+SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+urleq="${BENDPOINT}${requestpath}"
+
+(curl -L -s "$urleq"  \
+ -X ${method}             \
  -H 'Content-Type: application/json' \
- --header "CB-ACCESS-KEY: $COINBASE_KEY" \
  --header "CB-ACCESS-SIGN: $SIG" \
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
- --header "CB-VERSION: $CBVERSION"  \
- --data-raw '{"product_id":"3","side":"BUY","order_configuration":{"market_market_ioc":{"quote_size":"5"},"sor_limit_ioc":{"limit_price":"5"}}}' | jq -r . > CB-output.json )
+ --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+ --header "CB-VERSION: 2017-12-01" \
+ --data-raw "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
-#############################################################################################
+
+###################################################################
     i=0
     ;;
     9)
@@ -3102,7 +3257,7 @@ echo -e '\E[32;40m'"\033[1m"
 echo "TESTING"
 echo -e '\E[33;40m'"\033[1m"
 echo "TEST Menu     = 0"
-echo "Pub LIST Prod = 1"
+echo "Create Order  = 1"
 echo "Skeleton      = 2"
 echo
 read -p "Type a number [0, 1, 2] :" x
@@ -3117,6 +3272,146 @@ read -p "Type a number [0, 1, 2] :" x
     ;;
 
     1)
+#############################################################################################
+#  ORDERS
+# POST https://api.coinbase.com/api/v3/brokerage/orders
+# curl -L -X POST 'https://api.coinbase.com/api/v3/brokerage/orders' \
+# --data-raw '{"client_order_id":"1","product_id":"BTC-USD","side":"BUY","order_configuration":{"market_market_ioc":{"quote_size":"2"},"limit_limit_gtc":{"post_only":true}}}'
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_postorder
+# https://docs.cdp.coinbase.com/advanced-trade/docs/rest-api-orders
+##################################################################################################
+clear
+columns=$(tput cols)
+lines=$(tput lines)
+fold -w "$columns" -bs  DOCS/create_order.txt
+echo
+ limit_price0="limit_price"
+ limit_price1=""
+ post_only0="post_only"
+ post1=""
+ method="POST"
+
+  basequote1=("quote_size" "base_size")
+  side1=("BUY" "SELL")
+  post1=("true" "false")
+
+
+ orderconfig1=("market_market_ioc" "limit_limit_gtc" "limit_limit_gtd")
+  read -p "Is this a MARKET or LIMIT order?  Default = [market]:" orderconfig ; orderconfig=${orderconfig:-market}
+  orderconfig=${orderconfig,,}
+
+  if [[ $orderconfig == "market" ]]; then
+  orderconfig0=${orderconfig1[dow-0]}
+  elif [[ "$orderconfig" == "limit" ]]; then
+  orderconfig0=${orderconfig1[dow-2]}
+  #basequote0=${basequote1[dow-1]}
+  elif [[ "$orderconfig" == "limit2" ]]; then
+  orderconfig0=${orderconfig1[dow-1]}
+  fi
+
+  read -p "Is this a BUY or SELL order? Default = [BUY]:" side1 ; side1=${side1:-BUY}
+  side1=${side1^^}
+  side0=${side1[dow-0]}
+  basequote0=${basequote1[dow-0]}
+  if [[ $side1 == "SELL" ]]; then
+  side0=${side1[dow-1]}
+  basequote0=${basequote1[dow-1]}
+  fi
+
+    while true; do
+    read -p "Which market would you like Default = [DOGE-USD]:" prod_id ; prod_id=${prod_id:-DOGE-USD}
+    prod_id=${prod_id^^}
+    BTCPRICE=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    PRODPRICE=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
+    echo "The current price of "$prod_id" is "$PRODPRICE"    ."
+    curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | jq .
+    echo -e '\E[32;40m'"\033[1m"
+
+    echo "quote=BUY only / base=BUY or SELL"
+    read -p "Enter QUOTE(buy) or BASE(sell) quantity :" quantity
+    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
+    read -p "Enter Limit price: " limit_price1
+    fi
+    echo -e '\E[33;40m'"\033[1m"
+    echo "This is a "${orderconfig0}" "${side0^^}" order."
+    echo "You entered (read carefully):"
+    echo "market= " $prod_id
+    prod_id=${prod_id^^}
+    echo "quote/base amount= " $quantity
+
+    price1=$(echo $quantity*$PRODPRICE | bc)
+
+    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
+    read -p "Post only (true or false) Default = [true]:" post1 ; post1=${post1:-true}
+    post1=${post1,,}
+    post0=${post1[dow-0]}
+    basequote0=${basequote1[dow-1]}
+    elif [[ $post1 == "false" ]]; then
+    post0=${post1[dow-1]}
+    basequote0=${basequote1[dow-1]}
+    fi
+
+    echo "price=  ~" $price1 " + fee"
+    echo
+    read -p "Are the above values what you wanted ?" yn
+    echo -e '\E[32;40m'"\033[1m"
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) continue;;
+        * ) echo "Please answer yes or no. ( Or y or n )";;
+    esac
+  done
+    while true; do
+     echo -e '\E[31;40m'"\033[1m"
+   read -p "Would you like to execute this transaction? ( y or n )" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exec $0;;
+        * ) echo "Please answer yes or no.";;
+    esac
+  done
+   echo -e '\E[32;40m'"\033[1m"
+
+requestpath="/api/v3/brokerage/orders"
+UUID1=$(uuidgen)
+PROD_ID=${prod_id}
+
+BODY="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\"}}}"
+
+ BODYLGTC="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
+
+if [[ ${orderconfig0} == "limit_limit_gtc" ]]; then
+BODY=${BODYLGTC}
+fi
+
+echo $BODY
+read -p "Last chance to check your information. Press ENTER if satisfied else <CTRL> c " n
+
+TIMESTAMP=$(date +%s)
+SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+urleq="${BENDPOINT}${requestpath}"
+
+(curl -L -s "$urleq"  \
+ -X ${method}             \
+ -H 'Content-Type: application/json' \
+ --header "CB-ACCESS-SIGN: $SIG" \
+ --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+ --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+ --header "CB-VERSION: 2017-12-01" \
+ --data-raw "${BODY}" | jq -r . > CB-output.json )
+ $editor CB-output.json
+
+
+##############################################################################
+##############################################################################
+##############################################################################
+
+
+
+read -p "STOP!!!!!!!!!!" n
+read -p "STOP!!!!!!!!!!" n
+read -p "STOP!!!!!!!!!!" n
 #########################################################################
 ########################################################################################
 # LIST PUBLIC PRODUCTS

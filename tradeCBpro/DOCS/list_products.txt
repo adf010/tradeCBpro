@@ -2,6 +2,11 @@ LIST PRODUCTS
 
 Get a list of the available currency pairs for trading.
 
-
-
-
+limit - The number of products to be returned. Use 0 for limit if using get_all_products.
+offset -  The number of products to skip before returning.
+product_type - Only returns the orders matching this product type. By default, returns all >
+product_ids - The list of trading pairs (e.g. 'BTC-USD').
+contract_expiry_type - Only returns the orders matching the contract expiry type. Only appl>
+expiring_contract_status - Only returns contracts with this status (default is UNEXPIRED).
+get_tradability_status - Whether or not to populate view_only with the tradability status of the product. This is only enabled for SPOT products.
+get_all_products - If true, return all products of all product types (including expired fut>
