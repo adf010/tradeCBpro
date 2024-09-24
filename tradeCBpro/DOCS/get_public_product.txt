@@ -1,0 +1,5 @@
+GET PUBLIC PRODUCT
+
+Get information on a single product by product ID.
+
+

@@ -1,0 +1,5 @@
+LIST PUBLIC PRODUCTS
+
+Get a list of the available currency pairs for trading.
+
+

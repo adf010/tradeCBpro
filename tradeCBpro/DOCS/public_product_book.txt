@@ -1,0 +1,5 @@
+PUBLIC PRODUCT BOOL
+
+Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter.
+
+

@@ -2,8 +2,7 @@ PRODUCT BOOK
 
 Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter.
 
-Enter a product id (ex. BTC-USD) and a limit of how many price/size to return. You can Enter 0 (zero) for maximum response. You can enter an aggregation price increment if you want.
+Enter a product id (ex. BTC-USD) and a limit of how many bid/ask to return. You can Enter 0 (zero) for maximum response. You can enter an aggregation price increment if you want.
 
-Hint: Entering nothing or 0 gives maximum returns.
-
+Product id is required.
 

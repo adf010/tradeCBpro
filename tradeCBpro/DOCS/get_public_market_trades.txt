@@ -1,0 +1,7 @@
+GET PUBLIC MARKET TRADES
+
+Get snapshot information by product ID about the last trades (ticks) and best bid/ask.
+
+Product ID and Limit are required parameters. Start and End time are optional (just hit ENTER).
+
+

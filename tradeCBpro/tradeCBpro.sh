@@ -167,7 +167,7 @@ read -p "Type a number [0, 1, 2] :" x
 
     1)
 ####################################################################
-# GET LIST ACCOUNTS
+# LIST ACCOUNTS
 # GET https://api.coinbase.com/api/v3/brokerage/accounts
 # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/accounts?limit=20&cursor=12345'
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getaccounts
@@ -236,7 +236,7 @@ done
     ;;
     2)
 ###################################################################################
-# GET GET ACCOUNT
+# GET ACCOUNT
 # GET https://api.coinbase.com/api/v3/brokerage/accounts/{account_uuid}
 # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/accounts/12345' \
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getaccount
@@ -421,7 +421,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
  method="GET"
  requestpath="/api/v3/brokerage/product_book"
 
-read -p "Enter product id (BTC-USD) : " product_id1
+read -p "Enter product id (ex. BTC-USD) : " product_id1
 #product_id1=${product_id1^^}
 read -p "Enter limit : " limit1
 read -p "Enter aggregation price increment : " agpri1
@@ -451,7 +451,7 @@ fi
     3)
 #####  WORKS  #####  TODO: add options
 ###########################################################################
-# GET LIST PRODUCTS
+# LIST PRODUCTS
 # GET https://api.coinbase.com/api/v3/brokerage/products
 # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products?limit=50&offset=10&product_ids=BTC-USD&contract_expiry_type=PERPETUAL&expiring_contract_status=STATUS_ALL' \
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getproducts
@@ -480,7 +480,7 @@ echo
     expiring_contract_status=""
     requestpath="/api/v3/brokerage/products"
 
-    read -p "Enter Product id(s) (BTC-USD) : " product_id1
+    read -p "Enter Product id(s) (ex. BTC-USD) : " product_id1
     product_id1=${product_id1^^}
     read -p "Enter limit of how many products to return : " limit1
 
@@ -504,7 +504,7 @@ echo
     ;;
     4)
  #########################################################################################
-    # GET  GET PRODUCT
+    # GET PRODUCT
     # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/products?product_ids=BTC-USD' \
     # GET https://api.coinbase.com/api/v3/brokerage/product/{product_id}
     # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getproduct
@@ -522,7 +522,7 @@ echo
     tradability_status0=""
     tradability_status1="true"
 
-    read -p "Enter desired product ( BTC-USD ) : " product_id1
+    read -p "Enter desired product (ex. BTC-USD ) : " product_id1
     echo
     echo "(Tradability is only enabled for SPOT products.)"
     read -p "Enter true or false for tradability status  : " tradability_status1
@@ -589,7 +589,7 @@ granularity="granularity"
 granularity1=""
 method="GET"
 
-read -p "Enter Product trading pair id (BTC-USD) : " product_id1
+read -p "Enter Product trading pair id (ex. BTC-USD) : " product_id1
 echo "Format start time as mm/dd/yyyy hh:mm or mm/dd/yyyy"
 read -p "Enter start time : " start1
 start1=$(date -u -d "$start1" +%s)
@@ -1080,7 +1080,7 @@ order_type1=("market_market_ioc" "limit_limit_gtc" "limit_limit_gtd")
   echo
   echo
   echo -e '\E[31;40m'"\033[1m"
-  read -p "Enter the Product id (BTC-USD) or leave blank for ALL " product_id
+  read -p "Enter the Product id (ex. BTC-USD) or leave blank for ALL " product_id
   product_id=${product_id^^}
   echo
   read -p "Enter SELL or BUY if you do not want default [UNKNOWN_ORDER_SIDE]:" side0 ; side0=${side0:-UNKNOWN_ORDER_SIDE}
@@ -1404,7 +1404,7 @@ echo
     ;;
     2)
 ########################################################################################
-# GET LIST PUBLIC PRODUCTS
+# GET PUBLIC PRODUCT BOOK
 # GET https://api.coinbase.com/api/v3/brokerage/market/product_book
 # curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/product_book?product_id=BTC-USD&limit=10' \
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproductbook
@@ -1413,21 +1413,25 @@ echo
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs DOCS/list_public_products.txt
+fold -w "$columns" -bs DOCS/public_product_book.txt
 echo
 
 method="GET"
-product_id="product_id"
+product_id0="product_id"
 product_id1=""
 limit0="limit"
 limit1=""
+aggregation_price_increment0="aggregation_price_increment"
+aggregation_price_increment1=""
+
 requestpath="/api/v3/brokerage/market/product_book"
 
-read -p "Enter Pruduct ID (BTC-USD): " product_id1
+read -p "Enter Pruduct id (ex. BTC-USD) : " product_id1
 product_id1=${product_id1^^}
-read -p "Enter responce limit: " limit1
+read -p "Enter Bid/Ask response limit : " limit1
+read -p "Enter desired aggregation price increment : " aggregation_price_increment1
 
-BODY="${qmark}${product_id}${eq1}${product_id1}${amps}${limit0}${eq1}${limit1}"
+BODY="${qmark}${product_id0}${eq1}${product_id1}${amps}${limit0}${eq1}${limit1}${amps}${aggregation_price_increment0}${eq1}${aggregation_price_increment1}"
 
 ( curl -L "${BENDPOINT}${requestpath}${BODY}" \
 -X ${method}  \
@@ -1437,50 +1441,104 @@ $editor CB-output.json
      i=0
      ;;
      3)
-     #   NOT FINISHED
-#######################################################################################
-# GET GET PUBLIC PRODUCTS
+ ########################################################################################
+# LIST PUBLIC PRODUCTS
 # GET https://api.coinbase.com/api/v3/brokerage/market/products
-# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products?limit=10&offset=5&product_type=SPOT&product_ids=BTC-USD' \
-# -H 'Content-Type: application/json'
+# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products?product_id=BTC-USD&limit=10'
 # https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproducts
-################################################################################################
+############################################################################################
 # Get a list of the available currency pairs for trading.
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs DOCS/get_public_products.txt
+fold -w "$columns" -bs DOCS/public_products.txt
 echo
 
-# TODO ADD OTHER OPTIONS
+array_gap=("TRUE" "FALSE")
+array_prodtype=("SPOT" "FUTURE" "UNKNOWN_PRODUCT_TYPE")
+array_expiry_type=("EXPIRING" "PERPETUAL" "UNKNOWN_CONTRACT_EXPIRY_TYPE")
+array_expiring_contract_status=("STATUS_ALL" "STATUS_EXPIRED" "STATUS_UNEXPIRED" "UNKNOWN_EXPIRING_CONTRACT_STATUS")
 
     method="GET"
-    offset="offset"
-    product_type="product_type"
-    product_id="product_id"
-    contract_expiry_type="contract_expiry_type"
-    expiring_contract_status="expiring_contract_status"
+    offset0="offset"
+    product_type0="product_type"
+    product_ids0="product_ids"
+    contract_expiry_type0="contract_expiry_type"
+    expiring_contract_status0="expiring_contract_status"
+    limit0="limit"
     limit1=""
     offset1=""
     product_type1=""
-    product_id1=""
+    product_ids1=""
     contract_expiry_type1=""
-    expiring_contract_status=""
+    expiring_contract_status1=""
+    get_all_products0="get_all_products"
+    get_all_products1=""
     requestpath="/api/v3/brokerage/market/products"
 
-    read -p "Enter Product id(s) (BTC-USD) : " product_id1
-    product_id1=${product_id1^^}
     read -p "Enter limit of how many products to return : " limit1
+    read -p "Enter offset number : " offset1
+    read -p "Enter Product Type (1=SPOT, 2=FUTURE, 3=UNKNOWN_PRODUCT_TYPE : )" index2
+    index2=$(($index2 - 1))
+    product_type1=${array_prodtype["index2"]}
 
-    BODY="${qmark}${limit}${eq1}${limit1}${amps}${product_id}${eq1}${product_id1}"
+   declare -a order_array
+   declare -a new_order_array
+   echo
+   echo
+   echo -e '\E[31;40m'"\033[1m"
+   echo "Be sure to press ENTER after every entry. Then "
+   echo "Use <CTRL> d when finished."
+   echo "(If leaving blank, do not press Enter. Just press <CTRL> d)"
+   echo -e '\E[32;40m'"\033[1m"
+   echo "Enter PRODUCT id(s) (MUST BE UPPERCASE ex. BTC-USD): "
+   k=0
+   while read line
+   do
+    lines="$line"
+    lines+=(\""$line"\",)
+    order_array=("${order_array[@]}" \""$lines"\",)
+    order_array=( "${order_array[@]}" )
+    new_order_array[$k]=$(echo ${product_ids0}${eq1}${order_array[$k]}${amps})
+    k=$(expr $k + 1)
+    line=""
+   done
+
+body0=${new_order_array[*]}
+BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[][]//g' | sed 's/"//g' | sed 's/.$//' | tr -d "," | tr -d ' ' )
+
+    read -p "Enter contract_expiry_type (1=EXPIRING, 2=PERPETUAL, 3=UNKNOWN_CONTRACT_EXPIRY_TYPE) : " index3
+    index3=$(($index3 - 1))
+    contract_expiry_type1=${array_expiry_type["index3"]}
+    echo
+
+    read -p "Enter expiring_contract_status (1=STATUS_ALL, 2=STATUS_EXPIRED, 3=STATUS_UNEXPIRED, 4=UNKNOWN_EXPIRING_CONTRACT_STATUS) : " index4
+    index4=$(($index4 - 1))
+    expiring_contract_status1=${array_expiring_contract_status["index4"]}
+    echo
+
+    read -p "Do you want to get all Products (1=TRUE, 2=FALSE) : " index1
+    index1=$(($index1 - 1))
+    get_all_products1=${array_gap["index1"]}
+    echo
+
+    BODY="${qmark}${limit}${eq1}${limit1}${amps}${offset0}${eq1}${offset1}${amps}${product_type0}${eq1}${product_type1}${amps}${BODY1}${amps}${contract_expiry_type0}${eq1}${contract_expiry_type1}${amps}${expiring_contract_status0}${eq1}${expiring_contract_status1}${amps}${get_all_products0}${eq1}${get_all_products1}"
     echo ${BODY}
     read -p "Press ENTER to continue: " n
 
-    (curl -L -X "GET" "${BENDPOINT}${requestpath}${BODY}" \
-    -H 'Content-Type: application/json' | jq -r . > CB-output.json )
+ TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+    -X ${method}  \
+    -H 'Content-Type: application/json' \
+    --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+    --header "CB-ACCESS-SIGN: $SIG" \
+    --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+    --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
 
-###################################################################
+#########################################################################
     i=0
     ;;
     4)
@@ -1497,17 +1555,18 @@ lines=$(tput lines)
 fold -w "$columns" -bs DOCS/get_public_product.txt
 echo
 
-read -p "Enter product ID (BTC-USD) " product_id1
+read -p "Enter product ID (ex. BTC-USD) " product_id1
 product_id1=${product_id1^^}
 
 ( curl -L -X GET "https://api.coinbase.com/api/v3/brokerage/market/products/${product_id1}" \
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
 $editor CB-output.json
 
+###########################################################################################
     i=0
     ;;
     5)
-#   NOT FINISHED
+#   TODO: product_id, start, end, granularity, limit
 ############################################################################################
 # GET PUBLIC PRODUCT CANDLES
 # GET https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}/candles
@@ -1518,8 +1577,9 @@ $editor CB-output.json
 clear
 columns=$(tput cols)
 lines=$(tput lines)
-fold -w "$columns" -bs DOCS/get_public_products_candles.txt
+fold -w "$columns" -bs DOCS/get_public_product_candles.txt
 echo
+read -p " " n
 
 # TODO ADD OTHER OPTIONS
 
@@ -1531,7 +1591,6 @@ echo
      i=0
      ;;
      6)
-#   NOT FINISHED
 ####################################################################################
 # GET MARKET TRADES
 # GET https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}/ticker
@@ -1544,8 +1603,8 @@ columns=$(tput cols)
 lines=$(tput lines)
 fold -w "$columns" -bs DOCS/get_public_market_trades.txt
 echo
+#read -p " " n
 
-product_id="product_id"
 product_id1=""
 limit="limit"
 limit1=""
@@ -1554,23 +1613,25 @@ end0="end"
 start1=""
 end1=""
 
-read -p "Enter product ID (ex. BTC-USD) : " product_id1
+read -p "Enter Product id (ex. BTC-USD) : " product_id1
 read -p "Enter limit : " limit1
 echo "Format start time as mm/dd/yyyy hh:mm (OR mm/dd/yyyy) "
 read -p "Enter start date/time : " start1
 echo "Format end time as mm/dd/yyyy hh:mm (OR mm/dd/yyyy) "
 read -p "Enter end date/time : " end1
-start1=$(date -u -d "$start1" +%s)
-end1=$(date -u -d "$end1" +%s)
-
-if [[ "${start1}" = "" ]]; then
-BODY="$BODY0"
-fi
 
 method="GET"
 requestpath="/api/v3/brokerage/market/products/${product_id1^^}/ticker"
 
+BODY0="${qmark}${limit}${eq1}${limit1}"
+
+if [[ "${start1}" != "" ]]; then
+start1=$(date -u -d "$start1" +%s)
+end1=$(date -u -d "$end1" +%s)
 BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end0}${eq1}${end1}"
+elif [[ "${start1}" -eq "" ]]; then
+BODY="$BODY0"
+fi
 
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
@@ -1580,7 +1641,8 @@ BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end
  -H 'Content-Type: application/json' | jq -r . > CB-output.json )
  $editor CB-output.json
 
-    i=0
+ ##################################################################
+     i=0
      ;;
      7)
 ###################################################################
@@ -2225,7 +2287,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     portfolio_uuid=""
     currency=""
 
-    read -p "Enter portfolio UUID : " portfolio_uuid
+    read -p "Enter Portfolio UUID : " portfolio_uuid
     read -p "Enter currency (i.e. USD) : " currency
     currency=${currency^^}
 
@@ -2667,9 +2729,16 @@ read -p "Press ENTER to close window. " y
     i=0
     ;;
     2) # EPOCHTIME
+   clear
+   columns=$(tput cols)
+   lines=$(tput lines)
+   fold -w "$columns" -bs DOCS/epoch2read.txt
+
   read -p "Type or paste Epoch time :" EPOCHTIME
   echo -e '\E[36;40m'"\033[1m"
   DATETIME= date -d @$EPOCHTIME
+  echo $DATETIME
+  DATETIME= date -u -d @$EPOCHTIME
   echo $DATETIME
   read -p "Press ENTER to continue:" z
 
@@ -3033,7 +3102,7 @@ echo -e '\E[32;40m'"\033[1m"
 echo "TESTING"
 echo -e '\E[33;40m'"\033[1m"
 echo "TEST Menu     = 0"
-echo "CANCEL        = 1"
+echo "Pub LIST Prod = 1"
 echo "Skeleton      = 2"
 echo
 read -p "Type a number [0, 1, 2] :" x
@@ -3049,7 +3118,102 @@ read -p "Type a number [0, 1, 2] :" x
 
     1)
 #########################################################################
+########################################################################################
+# LIST PUBLIC PRODUCTS
+# GET https://api.coinbase.com/api/v3/brokerage/market/products
+# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products?product_id=BTC-USD&limit=10'
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproducts
+############################################################################################
+# Get a list of the available currency pairs for trading.
+clear
+columns=$(tput cols)
+lines=$(tput lines)
+fold -w "$columns" -bs DOCS/public_products.txt
+echo
 
+array_gap=("TRUE" "FALSE")
+array_prodtype=("SPOT" "FUTURE" "UNKNOWN_PRODUCT_TYPE")
+array_expiry_type=("EXPIRING" "PERPETUAL" "UNKNOWN_CONTRACT_EXPIRY_TYPE")
+array_expiring_contract_status=("STATUS_ALL" "STATUS_EXPIRED" "STATUS_UNEXPIRED" "UNKNOWN_EXPIRING_CONTRACT_STATUS")
+
+    method="GET"
+    offset0="offset"
+    product_type0="product_type"
+    product_ids0="product_ids"
+    contract_expiry_type0="contract_expiry_type"
+    expiring_contract_status0="expiring_contract_status"
+    limit0="limit"
+    limit1=""
+    offset1=""
+    product_type1=""
+    product_ids1=""
+    contract_expiry_type1=""
+    expiring_contract_status1=""
+    get_all_products0="get_all_products"
+    get_all_products1=""
+    requestpath="/api/v3/brokerage/market/products"
+
+    read -p "Enter limit of how many products to return : " limit1
+    read -p "Enter offset number : " offset1
+    read -p "Enter Product Type (1=SPOT, 2=FUTURE, 3=UNKNOWN_PRODUCT_TYPE : )" index2
+    index2=$(($index2 - 1))
+    product_type1=${array_prodtype["index2"]}
+
+   declare -a order_array
+   declare -a new_order_array
+   echo
+   echo
+   echo -e '\E[31;40m'"\033[1m"
+   echo "Be sure to press ENTER after every entry. Then "
+   echo "Use <CTRL> d when finished."
+   echo "(If leaving blank, do not press Enter. Just press <CTRL> d)"
+   echo -e '\E[32;40m'"\033[1m"
+   echo "Enter PRODUCT id(s) (MUST BE UPPERCASE ex. BTC-USD): "
+   k=0
+   while read line
+   do
+    lines="$line"
+    lines+=(\""$line"\",)
+    order_array=("${order_array[@]}" \""$lines"\",)
+    order_array=( "${order_array[@]}" )
+    new_order_array[$k]=$(echo ${product_ids0}${eq1}${order_array[$k]}${amps})
+    k=$(expr $k + 1)
+    line=""
+   done
+
+body0=${new_order_array[*]}
+BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[][]//g' | sed 's/"//g' | sed 's/.$//' | tr -d "," | tr -d ' ' )
+
+    read -p "Enter contract_expiry_type (1=EXPIRING, 2=PERPETUAL, 3=UNKNOWN_CONTRACT_EXPIRY_TYPE) : " index3
+    index3=$(($index3 - 1))
+    contract_expiry_type1=${array_expiry_type["index3"]}
+    echo
+
+    read -p "Enter expiring_contract_status (1=STATUS_ALL, 2=STATUS_EXPIRED, 3=STATUS_UNEXPIRED, 4=UNKNOWN_EXPIRING_CONTRACT_STATUS) : " index4
+    index4=$(($index4 - 1))
+    expiring_contract_status1=${array_expiring_contract_status["index4"]}
+    echo
+
+    read -p "Do you want to get all Products (1=TRUE, 2=FALSE) : " index1
+    index1=$(($index1 - 1))
+    get_all_products1=${array_gap["index1"]}
+    echo
+
+    BODY="${qmark}${limit}${eq1}${limit1}${amps}${offset0}${eq1}${offset1}${amps}${product_type0}${eq1}${product_type1}${amps}${BODY1}${amps}${contract_expiry_type0}${eq1}${contract_expiry_type1}${amps}${expiring_contract_status0}${eq1}${expiring_contract_status1}${amps}${get_all_products0}${eq1}${get_all_products1}"
+    echo ${BODY}
+    read -p "Press ENTER to continue: " n
+
+ TIMESTAMP=$(date +%s)
+ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
+
+   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+    -X ${method}  \
+    -H 'Content-Type: application/json' \
+    --header "CB-ACCESS-KEY: $COINBASE_KEY" \
+    --header "CB-ACCESS-SIGN: $SIG" \
+    --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
+    --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
+    $editor CB-output.json
 
 #########################################################################
     i=0
