@@ -1,0 +1,3 @@
+REMOVE KEYS
+
+This will remove your key/secret from the files wCB-KEY1.txt and wCB-KEY2.txt respectively. If you also want to remove possibly sensitive information, you should use option #3 on this menu.

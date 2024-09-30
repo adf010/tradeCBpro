@@ -1,0 +1,1 @@
+This will REMOVE ALL KEYS (Legacy and/or CDP) as well as the CB-output.json file.The CB-output.json file is the output you see in response to most of the calls. This file may contain sensitive data such as UUID's for Payment Methods, Fiat wallets, etc.

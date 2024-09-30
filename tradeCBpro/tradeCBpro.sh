@@ -1,6 +1,8 @@
 #!/bin/bash
-CURRVER=0.9-beta.8
+CURRVER=0.9.8
 cd "${0%/*}"
+ PATH5="/home/$USER/venv/bin/activate"
+ source "$PATH5"
 #
 #
 # This software is not associated with nor endorsed by Coinbase™ who shall be held harmless for use or misuse of this product.
@@ -18,19 +20,37 @@ cd "${0%/*}"
 ######################
 # To use instant sign-in put key and secret in the 2 files
 # below by using option 8 on the menu.
+
+# REMOVE THE COMMENT SYMBOL '#' ON THE NEXT LINE IF YOU USE CDP KEYS ONLY
+ echo "a" >> wCB-KEY2.txt     # prevents script from asking about keys when starting
+
 COINBASE_KEY=`cat wCB-KEY1.txt`
 COINBASE_SECRET=`cat wCB-KEY2.txt`
-# ANOTHER, MORE SECURE METHOD TO ENTER API KEYS
-if [[ "$COINBASE_KEY" == "" ]]; then
-echo "Enter KEY at first prompt and SECRET at second prompt to put keys in memory."
+PRIVATE_KEYA=`cat wCB_CDP-KEY1.txt`
+PRIVATE_KEY2A=`cat wCB_CDP-KEY2.txt`
+
+echo -e '\E[31;40m'"\033[1m"
+if [[ "$COINBASE_SECRET" == "" ]]; then
+read -p "Do You want to Enter LEGACY API Keys into variables?  y/n : " yn
+case $yn in
+        [Yy]* )
+        echo -e '\E[32;40m'"\033[1m"
+echo "Enter LEGACY KEY at first prompt and SECRET at second prompt to put keys in memory."
 echo "Keys will be 'forgotten' when you exit script. "
 echo "Optionally you can Enter KEY/SECRET into respective files or use the menu "
 echo "option which retains your keys until deleted or using the Remove Keys option."
 echo "If you want to store keys then just press ENTER twice to start script."
 echo "Then use option 8 on the menu. "
-read -p "Enter API key: " COINBASE_KEY
-read -p "Enter API secret: " COINBASE_SECRET
+read -p "Enter LEGACY API key: " COINBASE_KEY
+read -p "Enter LEGACY API secret: " COINBASE_SECRET
+break;;
+[Nn]* )
+echo -e '\E[32;40m'"\033[1m"
+esac
 fi
+
+echo -e '\E[32;40m'"\033[1m"
+#############################################################################
 # Set CB-VERSION
 CBVERSION="2017-12-01"
 ###### ENDPOINTS #####
@@ -99,6 +119,7 @@ editor=nano
 BASEENDPOINT1="https://api.coinbase.com"
 BENDPOINT=$BASEENDPOINT1
 ##################################################################
+
 eq1="="
 amps="&"
 qmark="?"
@@ -123,7 +144,7 @@ echo "===================================="
   echo "[6]  DEPOSIT/WITHDRAW"
   echo "[7]  PORTFOLIO"
   echo "[8]  ENTER/REMOVE KEYS"
-  echo "[9]  Not Used"
+  echo "[9]  KEY PERMISSIONS"
   echo "[10] Miscellaneous"
   echo "===================================="
   printf "\n"
@@ -185,9 +206,11 @@ retail_portfolio_id0="retail_portfolio_id"
 retail_portfolio_id1=""
 limit0=""
 cursor0="cursor"
+cursor1=""
 PATH0="$PWD"/CB-output.json
-rm "$PWD"/CB-output.json
+rm -f "$PWD"/CB-output.json
 touch "$PWD"/CB-output.json
+
 echo -e '\E[32;40m'"\033[1m"
 read -p "Enter Retail Portfolio ID or press ENTER for default : " retail_portfolio_id1
 read -p "Enter limit of accounts to display (or 0 for all) : " limit0
@@ -200,12 +223,30 @@ else
 page0=$(cat $PATH0 | grep -w cursor | tr -d '"' | sed 's/,*$//g' | sed 's/cursor://' | tr -d " ")
 fi
 
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh  # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+fi
+
 BODY="${limit}${eq1}${limit0}${amps}${cursor0}${eq1}${page0}${amps}${retail_portfolio_id0}${eq1}${retail_portfolio_id1}"
 
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -213,7 +254,6 @@ TIMESTAMP=$(date +%s)
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
-
 echo -e '\E[31;40m'"\033[1m"
    read -p "Are you finished y/n : " yn
 case $yn in
@@ -231,11 +271,16 @@ case $yn in
     echo -e '\E[32;40m'"\033[1m"
 done
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
 #     printf "\n"
 ##################################################################
     i=0
     ;;
     2)
+
+ ###   THIS ONE           THIS ONE      THIS ONE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ###################################################################################
 # GET ACCOUNT
 # GET https://api.coinbase.com/api/v3/brokerage/accounts/{account_uuid}
@@ -255,10 +300,30 @@ method="GET"
 requestpath="/api/v3/brokerage/accounts/"
 BODY="$account_id"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}${BODY}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H 'Content-Type: application/json'  "${BENDPOINT}${requestpath}${BODY}" \
  -X ${method}  \
  -H 'Content-Type: application/json'  \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -266,6 +331,9 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha25
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##################################################################
     i=0
@@ -338,6 +406,26 @@ requestpath="/api/v3/brokerage/best_bid_ask"
 product_ids="product_ids"
 product_id=""
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 echo "To display all products enter          1 "
 echo "To display one product enter           2 "
 echo "To display one or more products enter  3 "
@@ -385,7 +473,7 @@ fi
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -395,6 +483,9 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
     $editor CB-output.json
     unset order_array
     unset new_order_array
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##################################################################
     i=0
@@ -422,6 +513,26 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
  method="GET"
  requestpath="/api/v3/brokerage/product_book"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 read -p "Enter product id (ex. BTC-USD) : " product_id1
 #product_id1=${product_id1^^}
 read -p "Enter limit : " limit1
@@ -437,7 +548,7 @@ fi
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -445,6 +556,9 @@ fi
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -488,6 +602,29 @@ array_gts=("TRUE" "FALSE")
     get_tradability_status0="get_tradability_status"
     get_tradability_status1=""
     requestpath="/api/v3/brokerage/products"
+
+    # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
+
+
 
     read -p "Enter limit of how many products to return : " limit1
     read -p "Enter offset number : " offset1
@@ -547,7 +684,7 @@ BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
+   ( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}" \
     -X ${method}  \
     -H 'Content-Type: application/json' \
     --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -555,6 +692,9 @@ BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
     $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##################################################################
     i=0
@@ -588,10 +728,30 @@ BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[
    requestpath="/api/v3/brokerage/products/${product_id1}"
    BODY="${qmark}${tradability_status0}${eq1}${tradability_status1}"
 
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+   if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
     TIMESTAMP=$(date +%s)
     SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  ( curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
+  ( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}"  \
    -X "${method}"  \
    -H 'Content-Type: application/json' \
    --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -599,6 +759,10 @@ BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[
     --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
     --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
     $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
 ##################################################################
     i=0
     ;;
@@ -662,6 +826,26 @@ limit1=$((limit1))
 
 requestpath="/api/v3/brokerage/products/${product_id1^^}/candles"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 BODY="${qmark}${start0}${eq1}${start1}${amps}${end0}${eq1}${end1}${amps}${limit0}${eq1}${limit1}${amps}${granularity}${eq1}${granularity1}"
 
 echo ${product_id1^^}
@@ -675,7 +859,7 @@ read -p "Press ENTER to continue : " n
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}"  \
  -X ${method}  \
  -H 'Content-Type: application/json'  \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -684,6 +868,9 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 
  $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##################################################################
     i=0
@@ -727,13 +914,33 @@ fi
 method="GET"
 requestpath="/api/v3/brokerage/products/${product_id1^^}/ticker"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end0}${eq1}${end1}"
 
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
  echo ${TIMESTAMP}
 
-(curl -L "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}" \
  -X ${method}  \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -742,6 +949,10 @@ BODY="${qmark}${limit}${eq1}${limit1}${amps}${start0}${eq1}${start1}${amps}${end
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
 
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+#################################################################
     i=0
     ;;
     7)
@@ -904,6 +1115,26 @@ requestpath="/api/v3/brokerage/orders"
 UUID1=$(uuidgen)
 PROD_ID=${prod_id}
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 BODY="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\"}}}"
 
  BODYLGTC="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
@@ -920,7 +1151,7 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha25
 
 urleq="${BENDPOINT}${requestpath}"
 
-(curl -L -s "$urleq"  \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json"  "$urleq"  \
  -X ${method}             \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -929,6 +1160,9 @@ urleq="${BENDPOINT}${requestpath}"
  --header "CB-VERSION: 2017-12-01" \
  --data-raw "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -972,6 +1206,26 @@ while read line
     line=""
    done
 
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+nano main.py
+fi
+
 BODY1=$(echo ${new_order_array[*]} | sed 's/,$//g' | tr -d ' ' | sed 's/\(.*\),/\1 /' | sed 's/,\{2,\}/,/g' | tr -d ' ' )
 BODY="{\"${order_ids0}\":[${BODY1}]}"
 
@@ -981,7 +1235,7 @@ TIMESTAMP=$(date +%s)
  #echo "${BODY}"
  #read -p " " n
 
-( curl -L "${BENDPOINT}${requestpath}" -d "${BODY}" -v \
+( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}"  \
  -X ${method} \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -989,6 +1243,11 @@ TIMESTAMP=$(date +%s)
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
+
+ read -p " " n
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -1026,10 +1285,31 @@ TIMESTAMP=$(date +%s)
  BODY="{\"${order_id0}\":\"${order_id1}\",\"${price0}\":\"${price1}\",\"${size0}\":\"${size1}\"}"
  echo "${BODY}"
    read -p "Press ENTER to continue : " n
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L  "${BENDPOINT}${requestpath}" -d "${BODY}" -v \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}"  \
  -X ${method}  \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1037,6 +1317,9 @@ TIMESTAMP=$(date +%s)
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -1072,10 +1355,31 @@ echo
  BODY="{\"${order_id0}\":\"${order_id1}\",\"${price0}\":\"${price1}\",\"${size0}\":\"${size1}\"}"
  echo "${BODY}"
    read -p "Press ENTER to continue : " n
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L  "${BENDPOINT}${requestpath}" -d "${BODY}" -v \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json"  "${BENDPOINT}${requestpath}" -d "${BODY}"  \
  -X ${method}  \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1083,6 +1387,9 @@ echo
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
  $editor CB-output.json
+
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
  ############################################################################################
     i=0
@@ -1198,10 +1505,31 @@ requestpath="/api/v3/brokerage/orders/historical/batch"
 BODY="product_id=${product_id}&order_side=${side0^^}&order_status=${order_status0}"
 #echo $BODY
 #read -p "" n
+
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1209,6 +1537,9 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json)
   $editor CB-output.json
+
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -1267,7 +1598,8 @@ read -p "Enter limit of filled orders to display  : " limit1
 
 
 while true; do
-  read -p "Enter the Product id (required) (ex. BTC-USD) " product_id1; product_id1=${product_id1^^}
+  read -p "Enter the Product id (required) (ex. BTC-USD) " product_id1
+  product_id1=${product_id1^^}
   #read -p "Enter limit of filled orders to display  : " limit1
   # "trade_time": "2024-08-21T21:20:54.193Z",   <-- from output
 
@@ -1279,10 +1611,30 @@ BODY="${limit0}${eq1}${limit1}${amps}${cursor0}${eq1}${page0}${amps}${retail_por
 echo ${BODY}
 read -p "Press ENTER to continue : " n
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
   SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${qmark}${BODY}"  \
   -X ${method}  \
   -H 'Content-Type: application/json'  \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1303,6 +1655,9 @@ case $yn in
        echo -e '\E[32;40m'"\033[1m"; read -p "Enter limit of filled orders to display (required) : " limit1
     esac
 done
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
    i=0
@@ -1330,10 +1685,30 @@ read -p "Enter Order ID : " order_id1
 
  requestpath="/api/v3/brokerage/orders/historical/${order_id1}"
 
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
- (curl -L -s "${BENDPOINT}${requestpath}" \
+ (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" \
  -X ${method} \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -1341,6 +1716,9 @@ read -p "Enter Order ID : " order_id1
  --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
  --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 $editor CB-output.json
+
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -1464,12 +1842,32 @@ fi
 echo $BODY
 read -p "Last chance to check your information. Press ENTER if satisfied else <CTRL> c " n
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
 urleq="${BENDPOINT}${requestpath}"
 
-(curl -L -s "$urleq"  \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "$urleq"  \
  -X ${method}             \
  -H 'Content-Type: application/json' \
  --header "CB-ACCESS-SIGN: $SIG" \
@@ -1478,6 +1876,9 @@ urleq="${BENDPOINT}${requestpath}"
  --header "CB-VERSION: 2017-12-01" \
  --data-raw "${BODY}" | jq -r . > CB-output.json )
  $editor CB-output.json
+
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -1713,7 +2114,7 @@ echo
 read -p "Enter product ID (ex. BTC-USD) " product_id1
 product_id1=${product_id1^^}
 
-( curl -L -X GET "https://api.coinbase.com/api/v3/brokerage/market/products/${product_id1}" \
+( curl -L -X "GET" "https://api.coinbase.com/api/v3/brokerage/market/products/${product_id1}" \
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
 $editor CB-output.json
 
@@ -1736,9 +2137,9 @@ fold -w "$columns" -bs DOCS/get_public_product_candles.txt
 echo
 read -p " " n
 
-# TODO ADD OTHER OPTIONS
+# TODO ADD OPTIONS
 
-( curl -L -X "GET" "https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD/candles" \
+( curl -L -s -X "GET" "https://api.coinbase.com/api/v3/brokerage/market/products/BTC-USD/candles" \
 -H 'Content-Type: application/json' | jq -r . > CB-output.json )
  $editor CB-output.json
 
@@ -1792,7 +2193,7 @@ fi
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
  echo ${TIMESTAMP}
 
-(curl -L -X "${method}" "${BENDPOINT}${requestpath}${BODY}" \
+(curl -L -s -X "${method}" "${BENDPOINT}${requestpath}${BODY}" \
  -H 'Content-Type: application/json' | jq -r . > CB-output.json )
  $editor CB-output.json
 
@@ -1871,10 +2272,30 @@ method="GET"
 BODY=""
 payment_method=""
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-( curl -L -s "${BENDPOINT}${requestpath}" \
+( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" \
 -X ${method} \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-SIGN: $SIG" \
@@ -1882,6 +2303,9 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 --header "CB-ACCESS-KEY: $COINBASE_KEY"  \
 --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ###################################################################
     i=0
@@ -1908,10 +2332,30 @@ payment_method=""
 read -p "Enter payment method id : " payment_method
 requestpath="/api/v3/brokerage/payment_methods/${payment_method}"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
 SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" \
 -X ${method} \
 -H 'Content-Type: application/json' \
 --header "CB-ACCESS-SIGN: $SIG" \
@@ -1920,6 +2364,10 @@ SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac
 --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
 $editor CB-output.json
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+###################################################################
     i=0
     ;;
     2)
@@ -2016,6 +2464,26 @@ echo
  method="POST"
  requestpath="/v2/accounts/${account_id1}/deposits"
 
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
@@ -2031,7 +2499,7 @@ echo
 
   urleq="${BENDPOINT}${requestpath}"
 
-  ( curl -L -s "$urleq"  \
+  ( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "$urleq"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2044,6 +2512,9 @@ echo
       [Nn]* )
       break;;
     esac
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
  ####################################################################
     i=0
@@ -2083,6 +2554,26 @@ amount="amount"
  method="POST"
  requestpath="/v2/accounts/${account_id1}/deposits"
 
+ # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
@@ -2093,7 +2584,7 @@ amount="amount"
 
   urleq="${BENDPOINT}${requestpath}"
 
-  ( curl -L -s "$urleq"  \
+  ( curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "$urleq"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2102,6 +2593,9 @@ amount="amount"
   --header "CB-VERSION: $CBVERSION" \
   --data-raw "${BODY}" | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #####################################################################
     i=0
@@ -2127,10 +2621,30 @@ echo "Hint: Portfolio Breakdown to get your Deposit account UUID."
 read -p "Enter Deposit Account UUID: " deposits_id
 requestpath="/v2/accounts/${deposits_id}/deposits"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2138,6 +2652,9 @@ TIMESTAMP=$(date +%s)
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #####################################################################
     i=0
@@ -2164,10 +2681,30 @@ read -p "Enter Deposit Account UUID: " deposits_id
 read -p "Enter single Deposit ID: " deposit_id
 requestpath="/v2/accounts/${deposits_id}/deposits/${deposit_id}"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits/${deposit_id}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "https://api.coinbase.com/v2/accounts/${deposits_id}/deposits/${deposit_id}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2175,6 +2712,9 @@ TIMESTAMP=$(date +%s)
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #####################################################################
    i=0
@@ -2214,6 +2754,26 @@ echo
 
 requestpath="/v2/accounts/${account_id1}/withdrawals"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
@@ -2226,7 +2786,7 @@ requestpath="/v2/accounts/${account_id1}/withdrawals"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2239,6 +2799,9 @@ TIMESTAMP=$(date +%s)
       [Nn]* )
       break;;
     esac
+
+    # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #####################################################################
    i=0
@@ -2277,6 +2840,26 @@ amount="amount"
 
 requestpath="/v2/accounts/${account_id1}/withdrawals"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  BODY='{"amount":"'${amount1}'","currency":"'${currency1^^}'","payment_method":"'${payment_method1}'","commit":"'${commit1}'"}'
  echo "${requestpath}"
  echo "${BODY}"
@@ -2285,7 +2868,7 @@ requestpath="/v2/accounts/${account_id1}/withdrawals"
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "${BENDPOINT}${requestpath}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2294,6 +2877,10 @@ TIMESTAMP=$(date +%s)
   --header "CB-VERSION: $CBVERSION" \
   --data-raw "${BODY}" | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
 #####################################################################
   i=0
    ;;
@@ -2317,10 +2904,30 @@ echo
 read -p "Enter Withdrawal Account UUID: " withdrawals_id
 requestpath="/v2/accounts/${withdrawals_id}/withdrawals"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2328,6 +2935,9 @@ TIMESTAMP=$(date +%s)
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #####################################################################
   i=0
@@ -2355,10 +2965,30 @@ read -p "Enter Withdrawal Account UUID: " withdrawals_id
 read -p "Enter single Withdrawal ID: " withdrawal_id
 requestpath="/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
 TIMESTAMP=$(date +%s)
  SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-(curl -L -s "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}" \
+(curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" "https://api.coinbase.com/v2/accounts/${withdrawals_id}/withdrawals/${withdrawal_id}" \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2366,6 +2996,9 @@ TIMESTAMP=$(date +%s)
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ####################################################################
   i=0
@@ -2449,10 +3082,30 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     requestpath="/api/v3/brokerage/portfolios/${portfolio_uuid}"
     BODY="${qmark}${currency}${eq1}${currency}"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2461,6 +3114,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+##############################################################################
     i=0
     ;;
     2)
@@ -2487,10 +3143,30 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     requestpath="/api/v3/brokerage/portfolios"
     BODY="${qmark}${portfolio_type1}"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2498,6 +3174,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #############################################################################
     i=0
@@ -2525,10 +3204,30 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     requestpath="/api/v3/brokerage/portfolios"
     BODY="{\"${name0}\":\"${portfolio_name1}\"}"
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
@@ -2537,6 +3236,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   -d "${BODY}" \
   | jq . > CB-output.json )
   $editor CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##############################################################################
     i=0
@@ -2563,6 +3265,26 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     requestpath="/api/v3/brokerage/portfolios/${portfolio_uuid1}"
     BODY=""
 
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "DELETE"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
      echo -e '\E[31;40m'"\033[1m"
     read -p "ARE YOU SURE YOU WANT TO DELETE PORTFOLIO ${portfolio_uuid1} ? y/n : " yn
 
@@ -2572,7 +3294,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s "${BENDPOINT}${requestpath}${BODY}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}${BODY}"  \
   -X ${method} \
   -H 'Content-Type: application/json' \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
@@ -2586,6 +3308,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
        [Nn]* )
        break;;
     esac
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 #############################################################################
     i=0
@@ -2619,11 +3344,31 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     #echo ${BODY}
     #read -p " " n
 
+    # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "PUT"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
    TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
  #(curl -L -H "Content-Type: application/json" "${BENDPOINT}${requestpath}" -d "${BODY}" -v  \
-  (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
@@ -2632,6 +3377,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   -d "${BODY}" \
   | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##############################################################################
     i=0
@@ -2663,10 +3411,30 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
 
 #-d '{"funds":{"value":"1.00","currency":"usd"},"source_portfolio_uuid":"12345","target_portfolio_uuid":"54321"}'
 
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+if [[ $COINBASE_KEY == "" ]]; then
+# Create keys and main.py
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+# Add method and request path to main.py
+sed -i '4s/.*/request_method = "POST"/' JWT_create/main.py
+sed -i "5s#.*#request_path = \""${requestpath}"\"#g" JWT_create/main.py
+#sed -i "5s#.*#request_path = \""/v2/accounts/${deposits_id}/deposits"\"#g" JWT_create/main.py
+#nano JWT_create/main.py
+
+# Copy main.py to working directory and process $JWT variable
+source makeJWT.sh
+source jwt2.sh
+#nano main.py
+fi
+
  TIMESTAMP=$(date +%s)
    SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
 
-  (curl -L -s -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
+  (curl -L -s -H "Authorization: Bearer $JWT" -X "${method}" -H "Content-Type: application/json" "${BENDPOINT}${requestpath}"  \
   -X ${method} \
   --header "CB-ACCESS-KEY: $COINBASE_KEY" \
   --header "CB-ACCESS-SIGN: $SIG" \
@@ -2675,6 +3443,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   -d "${BODY}" \
   | jq . > CB-output.json )
   $editor CB-output.json
+
+  # Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
 
 ##############################################################################
     i=0
@@ -2719,11 +3490,13 @@ echo -e '\E[32;40m'"\033[1m"
 echo "ENTER/REMOVE KEYS"
 echo -e '\E[33;40m'"\033[1m"
 echo "Main Menu           = 0"
-echo "Enter Keys          = 1"
-echo "Remove Keys         = 2"
-echo "Remove Private Info = 3"
+echo "Enter LEGACY Keys   = 1"
+echo "Remove LEGACY Keys  = 2"
+echo "Enter CDP Keys      = 3"
+echo "Remove CDP Keys     = 4"
+echo "Remove Private Info = 5"
 echo
-read -p "Enter your choice [0, 1, 2, 3] :" x
+read -p "Enter your choice [0, 1, 2, 3, 4, 5] :" x
 
    case $x in
 
@@ -2734,18 +3507,18 @@ read -p "Enter your choice [0, 1, 2, 3] :" x
     i=0
     ;;
 #####################################################################
-    1) # Enter Keys
-
+    1) # Enter LEGACY Keys
+#####################################################################
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold -w "$columns" -bs  DOCS/enter_keys.txt
+    fold -w "$columns" -bs  DOCS/enter_legacy_keys.txt
     echo
 
     read -p "Press ENTER to continue " n
     echo
     echo -e '\E[31;40m'"\033[1m"
-    read -p "ARE YOU SURE YOU WANT TO ENTER YOUR KEYS? y/n : " yn
+    read -p "ARE YOU SURE YOU WANT TO ENTER YOUR LEGACY KEYS? y/n : " yn
 
     case $yn in
         [Yy]* )
@@ -2761,18 +3534,17 @@ read -p "Enter your choice [0, 1, 2, 3] :" x
 #####################################################################
     i=0
     ;;
-    2) # Remove keys
-###########
+    2) # Remove LEGACY keys
+#####################################################################
     clear
     columns=$(tput cols)
     lines=$(tput lines)
-    fold -w "$columns" -bs  DOCS/remove_keys.txt
+    fold -w "$columns" -bs  DOCS/remove_legacy_keys.txt
     echo
-    #WARN="WARNING!!!"
     read -p "Press ENTER to continue " n
     echo
     echo -e '\E[31;40m'"\033[1m"
-    read -p "ARE YOU SURE YOU WANT TO REMOVE YOUR KEYS? y/n : " yn
+    read -p "ARE YOU SURE YOU WANT TO REMOVE YOUR LEGACY KEYS? y/n : " yn
 
 case $yn in
         [Yy]* )
@@ -2788,9 +3560,71 @@ case $yn in
         break;;
 esac
 
+#####################################################################
     i=0
     ;;
-    3) # Remove all sensitve informatio
+    3) # Enter CDP Keys
+#####################################################################
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/enter_CDP_keys.txt
+    echo
+
+    read -p "Press ENTER to continue " n
+    echo
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO ENTER YOUR CDP KEYS? y/n : " yn
+
+    case $yn in
+        [Yy]* )
+        $editor wCB_CDP-KEY1.txt
+        $editor wCB_CDP-KEY2.txt
+        PRIVATE_KEYA=`cat wCB_CDP-KEY1.txt`
+        PRIVATE_KEY2A=`cat wCB_CDP-KEY2.txt`
+        #echo $PRIVATE_KEYA
+        #echo $PRIVATE_KEY2A
+        #read -p " " n
+
+        continue;;
+        [Nn]* )
+        break;;
+    esac
+
+#####################################################################
+   i=0
+    ;;
+    4) # Remove CDP Keys
+#####################################################################
+    clear
+    columns=$(tput cols)
+    lines=$(tput lines)
+    fold -w "$columns" -bs  DOCS/remove_CDP_keys.txt
+    echo
+    read -p "Press ENTER to continue " n
+    echo
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO REMOVE YOUR CDP KEYS FROM FILES? y/n : " yn
+
+case $yn in
+        [Yy]* )
+        echo -e '\E[32;40m'"\033[1m"
+
+        rm -f wCB_CDP-KEY1.txt
+        rm -f wCB_CDP-KEY2.txt
+        touch wCB_CDP-KEY1.txt
+        touch wCB_CDP-KEY2.txt
+
+        continue;;
+        [Nn]* )
+        break;;
+esac
+
+#####################################################################
+    i=0
+    ;;
+    5) # Remove all sensitve information
+#####################################################################
 #####################################################################
     clear
     columns=$(tput cols)
@@ -2798,13 +3632,7 @@ esac
     fold -w "$columns" -bs  DOCS/remove_keys_info.txt
     echo
 
-echo "This will REMOVE KEYS as well as the CB-output.json file."
-echo "The CB-output.json file is the output you see in response"
-echo "to most of the calls. This file may contain sensitive data"
-echo "such as UUID's for Payment Methods, Fiat wallets, etc."
-
-WARN="WARNING!!!"
-    read -p "Press ENTER to continue " n
+   # read -p "Press ENTER to continue " n
     echo
     echo -e '\E[31;40m'"\033[1m"
     read -p "ARE YOU SURE YOU WANT TO DELETE YOUR KEYS and SENSITIVE info? y/n : " yn
@@ -2813,18 +3641,63 @@ WARN="WARNING!!!"
         [Yy]* )
         echo -e '\E[32;40m'"\033[1m"
 
+rm -f wCB_CDP-KEY1.txt
+rm -f wCB_CDP-KEY2.txt
+touch wCB_CDP-KEY1.txt
+touch wCB_CDP-KEY2.txt
 rm -f wCB-KEY1.txt
 rm -f wCB-KEY2.txt
-rm -f CB-output.json
 touch wCB-KEY1.txt
 touch wCB-KEY2.txt
+rm -f CB-output.json
+rm -f main.py
+rm -f JWT_creste/main.py
+rm -f .env
 
         continue;;
         [Nn]* )
         break;;
     esac
 
-#####################################################################
+######################################################################
+    i=0
+    ;;
+    6) # Add CDP Keys to .env
+######################################################################
+echo "This will put you CDP Keys into environment."
+echo "You will need to run option '6' when finished to remove. "
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO PLACE YOUR CDP KEYS INTO ENV? y/n : " yn
+
+case $yn in
+        [Yy]* )
+        echo -e '\E[32;40m'"\033[1m"
+
+        read -p "Enter CDP Key : " PRIVATE_KEYA
+        source fix_newline_pass.sh
+        read -p "Enter CDP SECRET : " PRIVATE_KEY2A
+
+        echo "export PRIVATE_KEY='$PRIVATE_KEYA'" >> .env
+        echo "export PRIVATE_KEY2='$PRIVATE_KEY2A'" >> .env
+
+        source .env
+
+        continue;;
+        [Nn]* )
+        break;;
+esac
+
+
+
+
+######################################################################
+    i=0
+    ;;
+    7)
+######################################################################
+
+
+######################################################################
     i=0
     ;;
     *)
@@ -2838,9 +3711,88 @@ echo -e '\E[32;40m'"\033[1m"
     printf "\n"
 
 #####################################################################
+     elif [[ "$m" == "9" ]]; then
+
+    if [[ "$ENDPOINT" == "$ENDPOINT1" ]]; then
+    echo -e '\E[36;40m'"\033[1m"
+    elif [[ "$ENDPOINT" == "$ENDPOINT2" ]]; then
+    printf "\n"
+    elif [[ "$ENDPOINT" == "$ENDPOINT3" ]]; then
 ##### 999999999999999999999999999999999999999999999999999999999999999
+#####################################################################
+     i=1
+     j=1
+while [ $j = 1 ] ; do
+clear
+echo -e '\E[32;40m'"\033[1m"
+echo "KEY PERMISSIONS"
+echo -e '\E[33;40m'"\033[1m"
+echo "Main Menu          = 0"
+echo "Key Permissions    = 1"
+echo
+read -p "Type a number [0, 1] :" x
 
+   case $x in
+    0) echo -ne '\n' | showMenu
+    #$x=0
+    j=0
+    i=0
+    ;;
+    1) # Key Permissions
+##################################################################################
+# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getapikeypermissions
+# curl -L 'https://api.coinbase.com/api/v3/brokerage/key_permissions'
+# GET https://api.coinbase.com/api/v3/brokerage/key_permissions
+##################################################################################
+# Get information about your CDP API key permissions
 
+clear
+columns=$(tput cols)
+lines=$(tput lines)
+fold  -w "$columns" -bs DOCS/cdp_key_permissions.txt
+echo
+read -p "Press Enter to continue " n
+
+source JWT_create/sanitize.sh
+
+method="GET"
+requestpath="/api/v3/brokerage/key_permissions"
+
+source JWT_create/pass.sh # Place keys in .env
+source JWT_create/create_main.sh # Create fresh main.py
+#######################################################
+sed -i '4s/.*/request_method = "GET"/' JWT_create/main.py
+sed -i '5s#.*#request_path = "/api/v3/brokerage/key_permissions"#g' JWT_create/main.py
+#nano JWT_create/main.py
+source makeJWT.sh # Copy main.py to working dir
+source jwt2.sh # Process JWT variable
+#nano main.py
+
+(curl -L -s -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" -X "GET" "${BENDPOINT}${requestpath}" |  jq . > CB-output.json )
+nano CB-output.json
+
+# Remove possible sensitive info and stale main.py
+source JWT_create/sanitize.sh
+
+################################################################################
+#############################################################
+    i=0
+    ;;
+    2) #
+##############################################################
+
+##############################################################
+    i=0
+    ;;
+    *)
+    #i=1;;
+
+  esac
+done
+echo -e '\E[32;40m'"\033[1m"
+
+    fi
+    printf "\n"
 #####################################################################
 ###  AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     elif [[ "$m" == "10" ]]; then
@@ -3246,7 +4198,7 @@ read -p "Type a number [1, 2, 3] :" x
 done
 echo -e '\E[32;40m'"\033[1m"
 
-##################################################################################
+#########################################################################
       elif [[ "$m" == "12" ]]; then
     ## T E S T I N G
 j=1
@@ -3258,7 +4210,7 @@ echo "TESTING"
 echo -e '\E[33;40m'"\033[1m"
 echo "TEST Menu     = 0"
 echo "Create Order  = 1"
-echo "Skeleton      = 2"
+echo "Key Perms     = 2"
 echo
 read -p "Type a number [0, 1, 2] :" x
 
@@ -3271,244 +4223,35 @@ read -p "Type a number [0, 1, 2] :" x
     i=0
     ;;
 
-    1)
-#############################################################################################
-#  ORDERS
-# POST https://api.coinbase.com/api/v3/brokerage/orders
-# curl -L -X POST 'https://api.coinbase.com/api/v3/brokerage/orders' \
-# --data-raw '{"client_order_id":"1","product_id":"BTC-USD","side":"BUY","order_configuration":{"market_market_ioc":{"quote_size":"2"},"limit_limit_gtc":{"post_only":true}}}'
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_postorder
-# https://docs.cdp.coinbase.com/advanced-trade/docs/rest-api-orders
-##################################################################################################
-clear
-columns=$(tput cols)
-lines=$(tput lines)
-fold -w "$columns" -bs  DOCS/create_order.txt
-echo
- limit_price0="limit_price"
- limit_price1=""
- post_only0="post_only"
- post1=""
- method="POST"
+    1) # Add CDP Keys to .env
+######################################################################
+echo "This will put you CDP Keys into environment."
+echo "You will need to run option '6' when finished to remove. "
+    echo -e '\E[31;40m'"\033[1m"
+    read -p "ARE YOU SURE YOU WANT TO PLACE YOUR CDP KEYS INTO ENV? y/n : " yn
 
-  basequote1=("quote_size" "base_size")
-  side1=("BUY" "SELL")
-  post1=("true" "false")
+case $yn in
+        [Yy]* )
+        echo -e '\E[32;40m'"\033[1m"
 
+        read -p "Enter CDP Key : " PRIVATE_KEYA
+        source fix_newline_pass.sh
+        read -p "Enter CDP SECRET : " PRIVATE_KEY2A
 
- orderconfig1=("market_market_ioc" "limit_limit_gtc" "limit_limit_gtd")
-  read -p "Is this a MARKET or LIMIT order?  Default = [market]:" orderconfig ; orderconfig=${orderconfig:-market}
-  orderconfig=${orderconfig,,}
+        echo "export PRIVATE_KEY='$PRIVATE_KEYA'" >> .env
+        echo "export PRIVATE_KEY2='$PRIVATE_KEY2A'" >> .env
 
-  if [[ $orderconfig == "market" ]]; then
-  orderconfig0=${orderconfig1[dow-0]}
-  elif [[ "$orderconfig" == "limit" ]]; then
-  orderconfig0=${orderconfig1[dow-2]}
-  #basequote0=${basequote1[dow-1]}
-  elif [[ "$orderconfig" == "limit2" ]]; then
-  orderconfig0=${orderconfig1[dow-1]}
-  fi
+        source .env
 
-  read -p "Is this a BUY or SELL order? Default = [BUY]:" side1 ; side1=${side1:-BUY}
-  side1=${side1^^}
-  side0=${side1[dow-0]}
-  basequote0=${basequote1[dow-0]}
-  if [[ $side1 == "SELL" ]]; then
-  side0=${side1[dow-1]}
-  basequote0=${basequote1[dow-1]}
-  fi
-
-    while true; do
-    read -p "Which market would you like Default = [DOGE-USD]:" prod_id ; prod_id=${prod_id:-DOGE-USD}
-    prod_id=${prod_id^^}
-    BTCPRICE=$(curl -s https://api.pro.coinbase.com/products/BTC-USD/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
-    PRODPRICE=$(curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | awk -F',' '{printf $5}' | tr -dc '. [:digit:]')
-    echo "The current price of "$prod_id" is "$PRODPRICE"    ."
-    curl -s https://api.pro.coinbase.com/products/${prod_id}/ticker | jq .
-    echo -e '\E[32;40m'"\033[1m"
-
-    echo "quote=BUY only / base=BUY or SELL"
-    read -p "Enter QUOTE(buy) or BASE(sell) quantity :" quantity
-    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
-    read -p "Enter Limit price: " limit_price1
-    fi
-    echo -e '\E[33;40m'"\033[1m"
-    echo "This is a "${orderconfig0}" "${side0^^}" order."
-    echo "You entered (read carefully):"
-    echo "market= " $prod_id
-    prod_id=${prod_id^^}
-    echo "quote/base amount= " $quantity
-
-    price1=$(echo $quantity*$PRODPRICE | bc)
-
-    if [[ $orderconfig0 == "limit_limit_gtc" ]]; then
-    read -p "Post only (true or false) Default = [true]:" post1 ; post1=${post1:-true}
-    post1=${post1,,}
-    post0=${post1[dow-0]}
-    basequote0=${basequote1[dow-1]}
-    elif [[ $post1 == "false" ]]; then
-    post0=${post1[dow-1]}
-    basequote0=${basequote1[dow-1]}
-    fi
-
-    echo "price=  ~" $price1 " + fee"
-    echo
-    read -p "Are the above values what you wanted ?" yn
-    echo -e '\E[32;40m'"\033[1m"
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) continue;;
-        * ) echo "Please answer yes or no. ( Or y or n )";;
-    esac
-  done
-    while true; do
-     echo -e '\E[31;40m'"\033[1m"
-   read -p "Would you like to execute this transaction? ( y or n )" yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exec $0;;
-        * ) echo "Please answer yes or no.";;
-    esac
-  done
-   echo -e '\E[32;40m'"\033[1m"
-
-requestpath="/api/v3/brokerage/orders"
-UUID1=$(uuidgen)
-PROD_ID=${prod_id}
-
-BODY="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\"}}}"
-
- BODYLGTC="{\"client_order_id\":\"$UUID1\",\"product_id\":\"${prod_id}\",\"side\":\"${side0^^}\",\"order_configuration\":{\"${orderconfig0}\":{\"${basequote0}\":\"${quantity}\",\"${limit_price0}\":\"${limit_price1}\",\"${post_only0}\":${post0}}}}"
-
-if [[ ${orderconfig0} == "limit_limit_gtc" ]]; then
-BODY=${BODYLGTC}
-fi
-
-echo $BODY
-read -p "Last chance to check your information. Press ENTER if satisfied else <CTRL> c " n
-
-TIMESTAMP=$(date +%s)
-SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}${BODY}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
-
-urleq="${BENDPOINT}${requestpath}"
-
-(curl -L -s "$urleq"  \
- -X ${method}             \
- -H 'Content-Type: application/json' \
- --header "CB-ACCESS-SIGN: $SIG" \
- --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
- --header "CB-ACCESS-KEY: $COINBASE_KEY" \
- --header "CB-VERSION: 2017-12-01" \
- --data-raw "${BODY}" | jq -r . > CB-output.json )
- $editor CB-output.json
-
-
-##############################################################################
-##############################################################################
-##############################################################################
+        continue;;
+        [Nn]* )
+        break;;
+esac
 
 
 
-read -p "STOP!!!!!!!!!!" n
-read -p "STOP!!!!!!!!!!" n
-read -p "STOP!!!!!!!!!!" n
 #########################################################################
-########################################################################################
-# LIST PUBLIC PRODUCTS
-# GET https://api.coinbase.com/api/v3/brokerage/market/products
-# curl -L -X GET 'https://api.coinbase.com/api/v3/brokerage/market/products?product_id=BTC-USD&limit=10'
-# https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproducts
-############################################################################################
-# Get a list of the available currency pairs for trading.
-clear
-columns=$(tput cols)
-lines=$(tput lines)
-fold -w "$columns" -bs DOCS/public_products.txt
-echo
 
-array_gap=("TRUE" "FALSE")
-array_prodtype=("SPOT" "FUTURE" "UNKNOWN_PRODUCT_TYPE")
-array_expiry_type=("EXPIRING" "PERPETUAL" "UNKNOWN_CONTRACT_EXPIRY_TYPE")
-array_expiring_contract_status=("STATUS_ALL" "STATUS_EXPIRED" "STATUS_UNEXPIRED" "UNKNOWN_EXPIRING_CONTRACT_STATUS")
-
-    method="GET"
-    offset0="offset"
-    product_type0="product_type"
-    product_ids0="product_ids"
-    contract_expiry_type0="contract_expiry_type"
-    expiring_contract_status0="expiring_contract_status"
-    limit0="limit"
-    limit1=""
-    offset1=""
-    product_type1=""
-    product_ids1=""
-    contract_expiry_type1=""
-    expiring_contract_status1=""
-    get_all_products0="get_all_products"
-    get_all_products1=""
-    requestpath="/api/v3/brokerage/market/products"
-
-    read -p "Enter limit of how many products to return : " limit1
-    read -p "Enter offset number : " offset1
-    read -p "Enter Product Type (1=SPOT, 2=FUTURE, 3=UNKNOWN_PRODUCT_TYPE : )" index2
-    index2=$(($index2 - 1))
-    product_type1=${array_prodtype["index2"]}
-
-   declare -a order_array
-   declare -a new_order_array
-   echo
-   echo
-   echo -e '\E[31;40m'"\033[1m"
-   echo "Be sure to press ENTER after every entry. Then "
-   echo "Use <CTRL> d when finished."
-   echo "(If leaving blank, do not press Enter. Just press <CTRL> d)"
-   echo -e '\E[32;40m'"\033[1m"
-   echo "Enter PRODUCT id(s) (MUST BE UPPERCASE ex. BTC-USD): "
-   k=0
-   while read line
-   do
-    lines="$line"
-    lines+=(\""$line"\",)
-    order_array=("${order_array[@]}" \""$lines"\",)
-    order_array=( "${order_array[@]}" )
-    new_order_array[$k]=$(echo ${product_ids0}${eq1}${order_array[$k]}${amps})
-    k=$(expr $k + 1)
-    line=""
-   done
-
-body0=${new_order_array[*]}
-BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[][]//g' | sed 's/"//g' | sed 's/.$//' | tr -d "," | tr -d ' ' )
-
-    read -p "Enter contract_expiry_type (1=EXPIRING, 2=PERPETUAL, 3=UNKNOWN_CONTRACT_EXPIRY_TYPE) : " index3
-    index3=$(($index3 - 1))
-    contract_expiry_type1=${array_expiry_type["index3"]}
-    echo
-
-    read -p "Enter expiring_contract_status (1=STATUS_ALL, 2=STATUS_EXPIRED, 3=STATUS_UNEXPIRED, 4=UNKNOWN_EXPIRING_CONTRACT_STATUS) : " index4
-    index4=$(($index4 - 1))
-    expiring_contract_status1=${array_expiring_contract_status["index4"]}
-    echo
-
-    read -p "Do you want to get all Products (1=TRUE, 2=FALSE) : " index1
-    index1=$(($index1 - 1))
-    get_all_products1=${array_gap["index1"]}
-    echo
-
-    BODY="${qmark}${limit}${eq1}${limit1}${amps}${offset0}${eq1}${offset1}${amps}${product_type0}${eq1}${product_type1}${amps}${BODY1}${amps}${contract_expiry_type0}${eq1}${contract_expiry_type1}${amps}${expiring_contract_status0}${eq1}${expiring_contract_status1}${amps}${get_all_products0}${eq1}${get_all_products1}"
-    echo ${BODY}
-    read -p "Press ENTER to continue: " n
-
- TIMESTAMP=$(date +%s)
- SIG=$(echo -n "${TIMESTAMP}${method}${requestpath}" | openssl dgst -sha256 -hmac "$COINBASE_SECRET" |cut -d' ' -f2);
-
-   ( curl -L -s "${BENDPOINT}${requestpath}${BODY}" \
-    -X ${method}  \
-    -H 'Content-Type: application/json' \
-    --header "CB-ACCESS-KEY: $COINBASE_KEY" \
-    --header "CB-ACCESS-SIGN: $SIG" \
-    --header "CB-ACCESS-TIMESTAMP: $TIMESTAMP" \
-    --header "CB-VERSION: $CBVERSION" | jq -r . > CB-output.json )
-    $editor CB-output.json
 
 #########################################################################
     i=0
@@ -3517,6 +4260,7 @@ BODY1=$(echo ${body0} | sed 's/\(.*\),/\1 /' | awk '{print "["$0"]"}' | sed 's/[
     #####################################################################
 echo "two"
 #########################################################################
+
 
 #########################################################################
     i=0
@@ -3528,7 +4272,7 @@ echo "two"
   esac
 done
 echo -e '\E[32;40m'"\033[1m"
-#######################################################################################
+#########################################################################
 printf "\n"
   fi
   showMenu

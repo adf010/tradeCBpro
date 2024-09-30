@@ -1,0 +1,66 @@
+ Instructions for installing virtualenv and python for Coinbase CDP keys.
+ ---------------------------------------------------------------------------
+ ###########################################################################
+ THIS IS FOR CDP KEYS ONLY. If only use Legacy keys, you will not need to
+ do anything but run the script.
+ ###########################################################################
+ Not familiar with virtual environments or Python? Don't worry, neither am I :)
+
+ I did the leg work so that your experience will be as painless as possible.
+ I have only used this and tested on Debian 12. There should be plenty of information
+ about installing on your system/OS on google. NOTE: When I installed, only
+ Debian 11 package was available but works perfectly. If you run into problems
+ feel free to reach out to mm on github or through email ---
+ adf010@protonmail.com
+
+ #########################################################################
+
+Some examples for starters
+
+ ##  Easy Start
+ -----------------------
+ mkdir environments
+ cd environments
+ python3 -m venv my_env
+ source my_env/bin/activate
+ nano hello.py
+ print("Hello, World!")
+ python hello.py
+
+
+ # This one looks like it is for Windows or maybe Mac. Linux users should
+ # change 'Scripts' to 'bin' If you already have venv set up from above then
+ # only use lines that have '***' after them.
+
+    $ pip install virtualenv
+    $ virtualenv virtualenv_name
+    $ .\ virtualenv_name\Scripts\activate  *** # Linux change Scripts to bin
+    pip freeze -l > requirements.txt # Only use this to create new list after install
+    $ pip install -r requirements.txt  ***
+    pip install package_name == version  *** # Only use this if python
+                                               # complains you need something.
+
+ ########################################################################
+ Handy commands:
+
+ pip list  # Shows list of requirements packages installed including system packages.
+
+
+
+ #########################################################################
+ Some helpful links:
+
+ https://stackoverflow.com/questions/14684968/how-to-export-virtualenv
+
+ https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-programming-environment-on-debian-11
+
+ https://docs.cdp.coinbase.com/coinbase-app/docs/api-key-authentication/#storing-credentials-securely
+
+ https://pip.pypa.io/en/stable/cli/
+
+ https://dev.to/dev0928/commonly-used-python-pip-commands-255d
+
+
+
+
+
