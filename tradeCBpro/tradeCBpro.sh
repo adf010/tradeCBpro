@@ -2477,13 +2477,9 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
     fold -w "$columns" -bs  DOCS/list_portfolios.txt
     echo
 
-  #read -p " " n
-
     method="GET"
     portfolio_type0="portfolio_type"
     portfolio_type1=""
-
- #   'https://api.coinbase.com/api/v3/brokerage/portfolios?portfolio_type=DEFAULT'
 
      read -p "Enter Portfolio Type? Default = [DEFAULT]:" portfolio_type1 ; portfolio_type1=${portfolio_type1:-DEFAULT}
      portfolio_type1=${portfolio_type1^^}
@@ -2503,6 +2499,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   --header "CB-VERSION: $CBVERSION" | jq . > CB-output.json )
   $editor CB-output.json
 
+#############################################################################
     i=0
     ;;
     3)
@@ -2541,6 +2538,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   | jq . > CB-output.json )
   $editor CB-output.json
 
+##############################################################################
     i=0
     ;;
     4)
@@ -2635,6 +2633,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   | jq . > CB-output.json )
   $editor CB-output.json
 
+##############################################################################
     i=0
     ;;
     6)
@@ -2677,6 +2676,7 @@ read -p "Enter your choice [0, 1, 2, 3, 4, 5, 6] :" x
   | jq . > CB-output.json )
   $editor CB-output.json
 
+##############################################################################
     i=0
     ;;
     7)
