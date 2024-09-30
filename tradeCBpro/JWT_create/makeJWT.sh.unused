@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cp /home/$USER/venv/tradeCBpro/JWT_create/main.py .

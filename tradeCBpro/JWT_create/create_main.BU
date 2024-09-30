@@ -1,0 +1,13 @@
+#!/bin/bash
+PATH4="/home/$USER/venv/tradeCBpro/JWT_create/main.py"
+echo "from coinbase import jwt_generator" >> "$PATH4"
+echo "api_key = "\"$PRIVATE_KEY"\"" >> "$PATH4"
+echo "api_secret = "\"$PRIVATE_KEY2"\"" >> "$PATH4"
+echo 'request_method = "GET"' >> "$PATH4"
+echo 'request_path = ""' >> "$PATH4"
+echo "def main():" >> "$PATH4"
+echo "    jwt_uri = jwt_generator.format_jwt_uri(request_method, request_path)" >> "$PATH4"
+echo "    jwt_token = jwt_generator.build_rest_jwt(jwt_uri, api_key, api_secret)" >> "$PATH4"
+echo "    print(jwt_token)" >> "$PATH4"
+echo 'if __name__ == "__main__":' >> "$PATH4"
+echo "    main()" >> "$PATH4"
