@@ -22,7 +22,7 @@ cd "${0%/*}"
 # below by using option 8 on the menu.
 
 # REMOVE THE COMMENT SYMBOL '#' ON THE NEXT LINE IF YOU USE CDP KEYS ONLY
- echo "a" >> wCB-KEY2.txt     # prevents script from asking about keys when starting
+# echo "a" >> wCB-KEY2.txt     # prevents script from asking about keys when starting
 
 COINBASE_KEY=`cat wCB-KEY1.txt`
 COINBASE_SECRET=`cat wCB-KEY2.txt`
@@ -263,7 +263,7 @@ case $yn in
         touch "$PWD"/CB-output.json
         break;;
         [Nn]* )
-       read -p "Enter cursor ID for start of list or press ENTER : " cursor1
+      # read -p "Enter cursor ID for start of list or press ENTER : " cursor1
        read -p "Enter limit of accounts to display (required) : " limit0
 
        echo -e '\E[32;40m'"\033[1m"
