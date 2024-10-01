@@ -998,7 +998,7 @@ echo "Edit Order Preview = 4"
 echo "List Orders        = 5"
 echo "List Fills         = 6"
 echo "Get Order          = 7"
-echo "Preview Order ***  = 8"
+echo "Preview Order      = 8"
 echo
 read -p "Enter a number [0, 1, 2, 3, 4, 5, 6, 7, 8] :" x
 

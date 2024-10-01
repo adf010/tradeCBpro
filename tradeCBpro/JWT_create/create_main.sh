@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH4="/home/$USER/venv/tradeCBpro/JWT_create/main.py"
+PATH4="$PWD/JWT_create/main.py"
 echo "from coinbase import jwt_generator" >> "$PATH4"
 echo "api_key = "\"$PRIVATE_KEY"\"" >> "$PATH4"
 echo "api_secret = "\"$PRIVATE_KEY2"\"" >> "$PATH4"

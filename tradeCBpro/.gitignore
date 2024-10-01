@@ -1,7 +1,5 @@
-rm -f wCB_CDP-KEY1.txt
-rm -f wCB_CDP-KEY2.txt
-touch wCB_CDP-KEY1.txt
-touch wCB_CDP-KEY2.txt
+wCB_CDP-KEY1.txt
+wCB_CDP-KEY2.txt
 wCB-KEY1.txt
 wCB-KEY2.txt
 CB-output.json
