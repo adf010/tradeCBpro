@@ -1,3 +1,2 @@
 Displays permissions of current CDP keys.
 
-Press ENTER to exit.
